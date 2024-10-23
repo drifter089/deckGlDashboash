@@ -20,6 +20,7 @@
     "@radix-ui/react-slot": "^1.1.0",
     "@radix-ui/react-switch": "^1.1.0",
     "@radix-ui/react-tabs": "^1.1.0",
+    "@turf/turf": "^7.1.0",
     "@types/d3-scale": "^4.0.0",
     "@types/mapbox-gl": "^3.4.0",
     "@types/webgl2": "^0.0.11",

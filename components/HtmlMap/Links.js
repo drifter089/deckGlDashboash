@@ -1,43 +1,19 @@
-export const US_DATA = {
-  id: "US",
-  substations:
-    "http://34.31.13.149:8000/geoserver/PyPSAEarthDashboard/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=PyPSAEarthDashboard%3Ageojson_all_clean_substations_US&maxFeatures=10000&outputFormat=application%2Fjson",
-  buses:
-    "http://34.31.13.149:8000/geoserver/PyPSAEarthDashboard/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=PyPSAEarthDashboard%3Ageojson_Buses_geojson_data_US&maxFeatures=10000&outputFormat=application%2Fjson",
-  lines:
-    "http://34.31.13.149:8000/geoserver/PyPSAEarthDashboard/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=PyPSAEarthDashboard%3Ageojson_network_lines_view_US&maxFeatures=10000&outputFormat=application%2Fjson",
-  polygon:
-    "http://34.31.13.149:8000/geoserver/PyPSAEarthDashboard/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=PyPSAEarthDashboard%3Ageojson_offshore_shapes_US&maxFeatures=10000&outputFormat=application%2Fjson",
-};
+const BASE_URL = "http://34.31.13.149:8000/geoserver/GIS_Dashboard/ows";
 
-export const COLUMBIA_DATA = {
-  // "PyPSAEarthDashboard:geojson_all_clean_substations_CO
-  // geojson_Buses_geojson_data_CO_2;
-  // geojson_network_lines_view_co_2;
-  // geojson_offshore_shapes_CO;
-  id: "CO",
-  substations:
-    "http://34.31.13.149:8000/geoserver/PyPSAEarthDashboard/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=PyPSAEarthDashboard%3Ageojson_all_clean_substations_CO&maxFeatures=10000&outputFormat=application%2Fjson",
-  buses:
-    "http://34.31.13.149:8000/geoserver/PyPSAEarthDashboard/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=PyPSAEarthDashboard%3Ageojson_Buses_geojson_data_CO_2&maxFeatures=10000&outputFormat=application%2Fjson",
-  lines:
-    "http://34.31.13.149:8000/geoserver/PyPSAEarthDashboard/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=PyPSAEarthDashboard%3Ageojson_network_lines_view_co_2&maxFeatures=10000&outputFormat=application%2Fjson",
-  polygon:
-    "http://34.31.13.149:8000/geoserver/PyPSAEarthDashboard/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=PyPSAEarthDashboard%3Ageojson_offshore_shapes_CO&maxFeatures=10000&outputFormat=application%2Fjson",
-};
+export const getGeoJsonData = (countryCode) => ({
+  buses: `${BASE_URL}?service=WFS&version=1.0.0&request=GetFeature&typeName=GIS_Dashboard%3Abuses_${countryCode.toLowerCase()}&maxFeatures=5000&outputFormat=application%2Fjson`,
+  lines: `${BASE_URL}?service=WFS&version=1.0.0&request=GetFeature&typeName=GIS_Dashboard%3Alines_${countryCode.toLowerCase()}&maxFeatures=5000&outputFormat=application%2Fjson`,
+});
 
-export const NIGERIA_DATA = {
-  // all_clean_substations
-  // Buses_geojson_data
-  // network_lines_view
-  // offshore_shapes;
-  id: "NG",
-  substations:
-    "http://34.31.13.149:8000/geoserver/PyPSAEarthDashboard/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=PyPSAEarthDashboard%3Aall_clean_substations&maxFeatures=10000&outputFormat=application%2Fjson",
-  buses:
-    "http://34.31.13.149:8000/geoserver/PyPSAEarthDashboard/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=PyPSAEarthDashboard%3ABuses_geojson_data&maxFeatures=10000&outputFormat=application%2Fjson",
-  lines:
-    "http://34.31.13.149:8000/geoserver/PyPSAEarthDashboard/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=PyPSAEarthDashboard%3Anetwork_lines_view&maxFeatures=10000&outputFormat=application%2Fjson",
-  polygon:
-    "http://34.31.13.149:8000/geoserver/PyPSAEarthDashboard/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=PyPSAEarthDashboard%3Aoffshore_shapes&maxFeatures=10000&outputFormat=application%2Fjson",
+export const COUNTRY_COORDINATES = {
+  AU: [-25.2744, 133.7751],
+  BR: [-14.2350, -51.9253],
+  CO: [4.5709, -74.2973],
+  DE: [51.1657, 10.4515],
+  IN: [20.5937, 78.9629],
+  IT: [41.8719, 12.5674],
+  MX: [23.6345, -102.5528],
+  NG: [9.0820, 8.6753],
+  US: [37.0902, -95.7129],
+  ZA: [-30.5595, 22.9375],
 };

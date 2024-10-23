@@ -1,0 +1,18 @@
+[project]
+authors = ["BryanFran <brramirez@unal.edu.co>"]
+channels = ["conda-forge"]
+description = "Add a short description here"
+name = "pixi_env"
+platforms = ["win-64"]
+version = "0.1.0"
+
+[tasks]
+
+[dependencies]
+gdal = ">=3.9.2,<4"
+geospatial = ">=0.10.4,<0.11"
+django = ">=5.1.2,<6"
+django-cors-headers = ">=4.4.0,<5"
+psycopg2-binary = ">=2.9.9,<3"
+djangorestframework = ">=3.15.2,<4"
+drf-yasg = ">=1.21.7,<2"

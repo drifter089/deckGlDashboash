@@ -3,260 +3,198 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { Map } from "react-map-gl/maplibre";
 import DeckGL from "@deck.gl/react";
-
-import type { MapViewState } from "@deck.gl/core";
+import type { MapViewState, ViewStateChangeParameters } from "@deck.gl/core";
 import { FlyToInterpolator } from "deck.gl";
 import { MyCustomLayers } from "./components/Layer";
-import { US_DATA, COLUMBIA_DATA, NIGERIA_DATA } from "./components/Links";
-import { BlockProperties } from "./components/Layer";
-import { GeoJsonLayer, PolygonLayer, ScatterplotLayer } from "@deck.gl/layers";
+import { getGeoJsonData, COUNTRY_COORDINATES } from "./components/Links";
 import BottomDrawer from "./popups/BottomDrawer";
 import MySideDrawer from "./popups/SideDrawer";
 import { useTheme } from "next-themes";
-import { Feature, Geometry } from "geojson";
-import type { PickingInfo } from "deck.gl";
 import CountrySelect from "./components/CountrySelect";
+import { GeoJsonLayer } from "@deck.gl/layers";
+import { FeatureCollection, Geometry, Point } from '@turf/helpers';
+import { Layer } from '@deck.gl/core';
+import { WebMercatorViewport } from '@deck.gl/core';
+import { bbox } from '@turf/turf';
 
-const DATA_URL =
-  "https://raw.githubusercontent.com/visgl/deck.gl-data/master/examples/geojson/vancouver-blocks.json"; // eslint-disable-line
+// Define the type based on COUNTRY_COORDINATES keys
+type CountryCode = keyof typeof COUNTRY_COORDINATES;
 
 const INITIAL_VIEW_STATE: MapViewState = {
-  latitude: 49.254,
-  longitude: -123.13,
-  zoom: 5,
-  minZoom: 3,
+  latitude: 0,
+  longitude: 0,
+  zoom: 2,
+  minZoom: 2,
   maxZoom: 20,
-  pitch: 30,
+  pitch: 0,
   bearing: 0,
 };
 
 const MAP_STYLE_LIGHT =
   "https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json";
-
 const MAP_STYLE_DARK =
   "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json";
 
 export default function MainMap() {
-  const { theme, setTheme } = useTheme();
-
-  const countries = [US_DATA, COLUMBIA_DATA, NIGERIA_DATA];
-  const DeckRef = useRef(null);
-
-  const [selectedCountry, setSelectedCountry] = useState(US_DATA);
-
-  const [selectedPointID, setSelectedPointID] = useState(null);
-  const [hoverPointID, setHoverPointID] = useState(null);
-
-  const [selectedLineID, setSelectedLineID] = useState(null);
-  const [hoverLineID, setHoverLineID] = useState(null);
-  const [lineOpen, setLineOpen] = useState(false);
-
-  const [initialViewState, setInitialViewState] =
-    useState<MapViewState>(INITIAL_VIEW_STATE);
-
+  const { theme } = useTheme();
+  const [selectedCountry, setSelectedCountry] = useState<CountryCode>("US");
+  const [busesData, setBusesData] = useState<FeatureCollection<Point> | null>(null);
+  const [linesData, setLinesData] = useState<FeatureCollection<Geometry> | null>(null);
+  const [viewState, setViewState] = useState<MapViewState>(INITIAL_VIEW_STATE);
   const [open, setOpen] = useState(false);
+  const [lineOpen, setLineOpen] = useState(false);
+  const [layers, setLayers] = useState<Layer[]>([]);
+  const [dataLoaded, setDataLoaded] = useState(false);
+  const [zoom, setZoom] = useState(INITIAL_VIEW_STATE.zoom);
+  const [hoveredObject, setHoveredObject] = useState(null);
+  const [clickedObject, setClickedObject] = useState(null);
 
-  const flyToGeometry = useCallback((info: any) => {
-    const cords = info;
-    console.log(cords);
-    setInitialViewState({
-      latitude: cords[1],
-      longitude: cords[0],
-      zoom: 5,
-      minZoom: 3,
-      maxZoom: 20,
-      pitch: 30,
-      bearing: 0,
-      transitionInterpolator: new FlyToInterpolator({ speed: 2 }),
-      transitionDuration: 500,
+  useEffect(() => {
+    const { buses, lines } = getGeoJsonData(selectedCountry);
+    console.log('Fetching data for country:', selectedCountry);
+    console.log('Buses URL:', buses);
+    console.log('Lines URL:', lines);
+
+    const fetchData = async (url: string, dataType: string) => {
+      try {
+        console.log(`Fetching ${dataType} data from:`, url);
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const contentType = response.headers.get("content-type");
+        console.log(`Content-Type for ${dataType}:`, contentType);
+        const data = await response.json();
+        console.log(`${dataType} data:`, data);
+        if (data.features && data.features.length > 0) {
+          console.log(`First feature of ${dataType}:`, data.features[0]);
+        } else {
+          console.log(`No features found in ${dataType} data`);
+        }
+        return data;
+      } catch (error) {
+        console.error(`Error fetching ${dataType} data:`, error);
+        return null;
+      }
+    };
+
+    Promise.all([
+      fetchData(buses, 'Buses'),
+      fetchData(lines, 'Lines')
+    ]).then(([busesData, linesData]) => {
+      console.log('Setting buses data:', busesData ? 'Data received' : 'No data');
+      console.log('Setting lines data:', linesData ? 'Data received' : 'No data');
+      setBusesData(busesData);
+      setLinesData(linesData);
+      setDataLoaded(true);
     });
+  }, [selectedCountry]);
+
+  useEffect(() => {
+    if (selectedCountry && COUNTRY_COORDINATES[selectedCountry]) {
+      const [latitude, longitude] = COUNTRY_COORDINATES[selectedCountry];
+      setViewState({
+        ...viewState,
+        latitude,
+        longitude,
+        zoom: 4,
+        transitionInterpolator: new FlyToInterpolator({ speed: 2 }),
+        transitionDuration: 1000,
+      });
+    }
+  }, [selectedCountry]);
+
+  useEffect(() => {
+    if (dataLoaded) {
+      const newLayers = MyCustomLayers(busesData, linesData, selectedCountry, viewState.zoom, hoveredObject, clickedObject);
+      setLayers(newLayers);
+      console.log('Updated layers:', newLayers);
+    }
+  }, [busesData, linesData, selectedCountry, dataLoaded, viewState.zoom, hoveredObject, clickedObject]);
+
+  useEffect(() => {
+    if (dataLoaded && busesData && linesData) {
+      const allFeatures = [
+        ...(busesData.features || []),
+        ...(linesData.features || [])
+      ];
+
+      if (allFeatures.length > 0) {
+        const [minLng, minLat, maxLng, maxLat] = bbox({
+          type: 'FeatureCollection',
+          features: allFeatures
+        });
+
+        const viewport = new WebMercatorViewport({
+          width: window.innerWidth,
+          height: window.innerHeight
+        });
+
+        const { longitude, latitude, zoom } = viewport.fitBounds(
+          [[minLng, minLat], [maxLng, maxLat]],
+          {
+            padding: 40
+          }
+        );
+
+        setViewState({
+          ...viewState,
+          longitude,
+          latitude,
+          zoom,
+          transitionInterpolator: new FlyToInterpolator({ speed: 2 }),
+          transitionDuration: 1000,
+        });
+      }
+    }
+  }, [dataLoaded, busesData, linesData]);
+
+  const onSelectCountry = useCallback((country: CountryCode) => {
+    setSelectedCountry(country);
   }, []);
 
-  useEffect(() => {
-    console.log(DeckRef.current);
+  const onViewStateChange = useCallback((params: ViewStateChangeParameters<MapViewState>) => {
+    setViewState(params.viewState);
+    setZoom(params.viewState.zoom);
   }, []);
 
-  useEffect(() => {
-    if (selectedPointID) {
+  const onHover = useCallback((info: any) => {
+    setHoveredObject(info.object);
+  }, []);
+
+  const onClick = useCallback((info: any) => {
+    setClickedObject(info.object === clickedObject ? null : info.object);
+  }, [clickedObject]);
+
+  const getTooltip = useCallback((info: any) => {
+    const { object } = info;
+    if (!object) return null;
+    
+    if (object.properties) {
+      if (object.properties.Bus) {
+        return `Bus: ${object.properties.Bus}`;
+      } else if (object.properties.Line) {
+        return `Line: ${object.properties.Line}`;
+      }
     }
-  }, [selectedPointID]);
-
-  useEffect(() => {
-    if (!lineOpen && selectedLineID) {
-      setLineOpen(false);
-      setSelectedLineID(null);
-    }
-  }, [lineOpen]);
-
-  useEffect(() => {
-    if (!open && selectedPointID) {
-      setOpen(false);
-      setSelectedPointID(null);
-    }
-  }, [open]);
-
-  // useEffect(() => {
-  //   console.log(selectedCountry.coordinates);
-  //   flyToGeometry(selectedCountry.coordinates);
-  // }, [selectedCountry]);
-
-  // const layers = countries.flatMap((country) =>
-  //   MyCustomLayers(
-  //     country.substations,
-  //     country.buses,
-  //     country.lines,
-  //     country.polygon,
-  //     country.id
-  //   )
-  // );
-
-  // somehow export hese functions without type errors to some other file
-
-  // function onClickPoint(info: PickingInfo, e: React.MouseEvent<HTMLElement>) {
-  //   e.stopPropagation();
-  //   const id = info.object.id;
-  //   if (selectedPointID === id) {
-  //     setSelectedPointID(null);
-  //     setOpen(false);
-  //   } else {
-  //     setSelectedPointID(id);
-  //     flyToGeometry(info.object.geometry.coordinates);
-  //     setOpen(true);
-  //   }
-  // }
-  // function onHoverPoint() {}
-  // function getRadius(d: Feature<Geometry, BlockProperties>): number {
-  //   if (selectedPointID === d.id) {
-  //     return 1100;
-  //   } else if (hoverPointID === d.id) {
-  //     return 750;
-  //   } else {
-  //     return 500;
-  //   }
-  // }
-
-  // function onClickLine() {}
-  // function onHoverLine() {}
-  // function getLineWidth() {}
-
-  const temp = [
-    new GeoJsonLayer({
-      id: `Linesus`,
-      data: US_DATA.lines,
-      opacity: 0.8,
-      stroked: true,
-      filled: true,
-      pickable: true,
-      lineWidthScale: 20,
-      getLineColor: [227, 26, 28],
-      getFillColor: [227, 26, 28],
-      getLineWidth: (d) => {
-        if (selectedLineID === d.id) {
-          return 2300;
-        } else if (hoverLineID === d.id) {
-          return 1600;
-        } else {
-          return 700;
-        }
-      },
-      onClick: (info, e) => {
-        console.log(info, e);
-        e.stopPropagation();
-        const id = info.object.id;
-        if (selectedLineID === id) {
-          setSelectedLineID(null);
-          setLineOpen(false);
-        } else {
-          setSelectedLineID(id);
-          flyToGeometry(info.coordinate);
-          setLineOpen(true);
-        }
-      },
-      onHover: (info, e) => {
-        console.log(info);
-        if (info.object) {
-          const id = info.object.id;
-          setHoverLineID(id);
-        } else {
-          setHoverLineID(null);
-        }
-      },
-      updateTriggers: {
-        getLineWidth: [selectedLineID, hoverLineID],
-      },
-      transitions: {
-        getLineWidth: 100,
-      },
-      autoHighlight: true,
-      parameters: {
-        depthTest: false,
-      },
-    }),
-    new GeoJsonLayer<BlockProperties>({
-      id: `Buses${2}`,
-      data: US_DATA.buses,
-      opacity: 1,
-      stroked: false,
-      filled: true,
-      pointType: "circle",
-      wireframe: true,
-      getPointRadius: (d) => {
-        if (selectedPointID === d.id) {
-          return 1100;
-        } else if (hoverPointID === d.id) {
-          return 750;
-        } else {
-          return 500;
-        }
-      },
-      pointRadiusScale: 100,
-      onClick: (info, e) => {
-        e.stopPropagation();
-        const id = info.object.id;
-        if (selectedPointID === id) {
-          setSelectedPointID(null);
-          setOpen(false);
-        } else {
-          setSelectedPointID(id);
-          flyToGeometry(info.object.geometry.coordinates);
-          setOpen(true);
-        }
-      },
-      onHover: (info, e) => {
-        if (info.object) {
-          const id = info.object.id;
-          setHoverPointID(id);
-        } else {
-          setHoverPointID(null);
-        }
-      },
-      getFillColor: [72, 123, 182],
-      pickable: true,
-      updateTriggers: {
-        getPointRadius: [selectedPointID, hoverPointID],
-      },
-      transitions: {
-        getPointRadius: 100,
-      },
-      autoHighlight: true,
-      parameters: {
-        depthTest: false,
-      },
-    }),
-  ];
-
-  // layers.push(temp[1]);
-  // layers.push(temp[0]);
+    
+    return `ID: ${object.id || 'Unknown'}`;
+  }, []);
 
   return (
     <>
+      <div style={{ position: 'absolute', top: 10, left: 10, zIndex: 1000 }}>
+        <CountrySelect onSelectCountry={onSelectCountry} />
+      </div>
       <div onContextMenu={(evt) => evt.preventDefault()}>
         <DeckGL
-          // layers={layers}
-          layers={temp}
-          initialViewState={initialViewState}
+          layers={layers}
+          initialViewState={viewState}
+          onViewStateChange={onViewStateChange}
           controller={true}
-          ref={DeckRef}
+          getTooltip={getTooltip}
+          onHover={onHover}
+          onClick={onClick}
         >
           <Map
             reuseMaps
@@ -271,10 +209,6 @@ export default function MainMap() {
         setOpen={setLineOpen}
         side={"left"}
         data={"Line"}
-      />
-      <CountrySelect
-      // selectedCountry={selectedCountry}
-      // setSelectedCountry={setSelectedCountry}
       />
     </>
   );
