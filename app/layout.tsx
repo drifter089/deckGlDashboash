@@ -4,6 +4,7 @@ import "./globals.css";
 import NavBar from "../components/NavBar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { CountryProvider } from "@/components/country-context";
+import { NavigationMenuDemo } from "@/components/TopNavBar/TopNavBar";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -33,6 +34,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased relative min-h-screen no-scrollbar`}
       >
+        <NavigationMenuDemo />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
