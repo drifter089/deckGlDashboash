@@ -12,6 +12,7 @@ import {
   getGeoJsonData,
   COUNTRY_S_NOM_RANGES,
   COUNTRY_VIEW_CONFIG,
+  COUNTRY_BOUNDS,
 } from "./components/Links";
 import { BlockProperties } from "./components/Layer";
 import { GeoJsonLayer } from "@deck.gl/layers";
@@ -39,17 +40,32 @@ const INITIAL_VIEW_STATE: MapViewState = {
   latitude: 49.254,
   longitude: -123.13,
   zoom: 4,
+<<<<<<< Updated upstream
   minZoom: 3,
   maxZoom: 20,
   pitch: 0,
   bearing: 0,
+=======
+  bearing: 0,
+  pitch: 0,
+  padding: { top: 0, bottom: 0, left: 0, right: 0 },
+  width: 100,
+  height: 100,
+  minZoom: 2,
+  maxZoom: 20
+>>>>>>> Stashed changes
 };
 
 const MAP_STYLE_LIGHT =
   "https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json";
 
+<<<<<<< Updated upstream
 const MAP_STYLE_DARK =
   "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json";
+=======
+const MAP_STYLE_LIGHT = "mapbox://styles/mapbox/light-v11";
+const MAP_STYLE_DARK = "mapbox://styles/mapbox/dark-v11";
+>>>>>>> Stashed changes
 
 function normalizeSnom(
   value: number,
@@ -163,6 +179,15 @@ export default function MainMap() {
 
   const [isLoading, setIsLoading] = useState(true);
 
+<<<<<<< Updated upstream
+=======
+  const [mapWidth, setMapWidth] = useState(window.innerWidth - 384);
+
+  const { networkView } = useNetworkView();
+
+  const [dimensions, setDimensions] = useState({ width: 100, height: 100 });
+
+>>>>>>> Stashed changes
   const loadBusCapacities = useCallback(async (country: string) => {
     if (!country) return;
 
@@ -384,6 +409,56 @@ export default function MainMap() {
     return networkVeiw ? allLayers.slice(1) : [allLayers[0]];
   };
 
+<<<<<<< Updated upstream
+=======
+  const handleViewTransition = useCallback((isNetworkView: boolean) => {
+    const countryCoordinates = COUNTRY_COORDINATES[selectedCountry];
+    const bounds = COUNTRY_BOUNDS[selectedCountry];
+    
+    if (dimensions.width < 1 || dimensions.height < 1) return;
+
+    const viewport = new WebMercatorViewport({
+      width: dimensions.width,
+      height: dimensions.height,
+      latitude: countryCoordinates[0],
+      longitude: countryCoordinates[1],
+      zoom: 1  
+    });
+
+    try {
+      const [[west, south], [east, north]] = bounds;
+      const validBounds: [[number, number], [number, number]] = [
+        [Math.max(-180, west), Math.max(-85, south)],
+        [Math.min(180, east), Math.min(85, north)]
+      ];
+
+      const {longitude, latitude, zoom} = viewport.fitBounds(validBounds, {
+        padding: isNetworkView ? 20 : 100
+      });
+
+      setViewState(currentViewState => ({
+        ...currentViewState,
+        latitude,
+        longitude,
+        zoom: isNetworkView ? zoom : Math.min(zoom - 1, 6),
+        minZoom: 2,
+        maxZoom: isNetworkView ? 20 : 8,
+        padding: currentViewState.padding,
+        width: dimensions.width,
+        height: dimensions.height,
+        transitionInterpolator: new FlyToInterpolator(),
+        transitionDuration: 2000
+      }));
+    } catch (error) {
+      console.error('Error fitting bounds:', error);
+    }
+  }, [selectedCountry, dimensions]);
+
+  useEffect(() => {
+    handleViewTransition(networkView);
+  }, [networkView, handleViewTransition]);
+
+>>>>>>> Stashed changes
   useEffect(() => {
     const countryCoordinates = COUNTRY_COORDINATES[selectedCountry];
     const viewConfig = COUNTRY_VIEW_CONFIG[selectedCountry];
@@ -420,12 +495,41 @@ export default function MainMap() {
   }, [selectedCountry, loadBusCapacities]);
 
   const onViewStateChange = useCallback(
+<<<<<<< Updated upstream
     (params: { viewState: MapViewState }) => {
       setZoomLevel(params.viewState.zoom);
+=======
+    (evt: ViewStateChangeEvent) => {
+      if (!evt.viewState) return;
+
+      const newZoom = Math.min(
+        Math.max(evt.viewState.zoom || viewState.zoom, 2),
+        20
+      );
+
+      const newViewState: ViewState = {
+        latitude: evt.viewState.latitude || viewState.latitude,
+        longitude: evt.viewState.longitude || viewState.longitude,
+        zoom: newZoom,
+        bearing: evt.viewState.bearing || viewState.bearing,
+        pitch: evt.viewState.pitch || viewState.pitch,
+        padding: viewState.padding,
+        width: window.innerWidth,
+        height: window.innerHeight,
+        minZoom: 2,
+        maxZoom: 20,
+        transitionDuration: viewState.transitionDuration,
+        transitionInterpolator: viewState.transitionInterpolator
+      };
+
+      setViewState(newViewState);
+      setZoomLevel(newZoom);
+>>>>>>> Stashed changes
     },
-    []
+    [viewState]
   );
 
+<<<<<<< Updated upstream
   return (
     <>
       <div onContextMenu={(evt) => evt.preventDefault()}>
@@ -435,6 +539,41 @@ export default function MainMap() {
           controller={true}
           ref={DeckRef}
           onViewStateChange={onViewStateChange as any}
+=======
+  useEffect(() => {
+    const updateDimensions = () => {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      setDimensions({ width, height });
+      setViewState(currentViewState => ({
+        ...currentViewState,
+        width,
+        height
+      }));
+      setMapWidth(width - 384);
+    };
+
+    updateDimensions();
+    window.addEventListener('resize', updateDimensions);
+    return () => window.removeEventListener('resize', updateDimensions);
+  }, []);
+
+  return (
+    <>
+      <div 
+        className="ml-96"
+        onContextMenu={(evt) => evt.preventDefault()}
+      >
+        <Map
+          reuseMaps
+          mapStyle={currentTheme === "light" ? MAP_STYLE_LIGHT : MAP_STYLE_DARK}
+          mapboxAccessToken={TOKEN}
+          viewState={viewState}
+          onMove={onViewStateChange}
+          minZoom={2}
+          maxZoom={20}
+          style={{ width: '100%', height: '100vh' }}
+>>>>>>> Stashed changes
         >
           <Map
             reuseMaps

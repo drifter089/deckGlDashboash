@@ -107,7 +107,6 @@ export function MyCustomLayers({
         },
         autoHighlight: true,
         parameters: {
-          depth: false,
           depthTest: false,
           blend: true
         } as any,
@@ -160,8 +159,8 @@ export function MyCustomLayers({
         },
         autoHighlight: true,
         parameters: {
-          depthTest: false,
-        },
+          depthTest: false
+        } as any,
       }),
     ];
 
