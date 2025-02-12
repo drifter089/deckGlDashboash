@@ -76,9 +76,6 @@ export function GenerationMixGeneral({ data }: Props) {
           };
         });
 
-      console.log("dataArray", dataArray);
-      console.log("transformedData", transformedData);
-
       setChartData(transformedData);
     }
   }, [data]);

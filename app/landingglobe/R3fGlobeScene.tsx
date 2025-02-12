@@ -46,6 +46,8 @@ interface GeoFeature {
   properties: {
     ADMIN?: string;
     name?: string;
+    country_name?: string;
+    country_code?: string;
   };
   geometry?: any;
 }
@@ -64,20 +66,30 @@ const GlobeViz = () => {
   const globeRef = useRef<GlobeMethods>(null);
   const cameraRef = useRef<any>(null);
 
-  const [hoveredCountry, setHoveredCountry] = useState<"in" | "out" | "null">(
-    "null"
-  );
-
+  const [hoveredCountry, setHoveredCountry] = useState<"in" | "out" | "null">("null");
   const [position, setPosition] = useState<Vector3>(new Vector3(60, 60, 60));
-
   const [globeReady, setGlobeReady] = useState(false);
 
-  const endpoints = Object.keys(COUNTRY_COORDINATES).map(
-    (country) => getGeoJsonData(country).countryView
+  const endpoints = useMemo(() => 
+    Object.keys(COUNTRY_COORDINATES).map(
+      (country) => getGeoJsonData(country).countryView
+    ), []
   );
 
-  const { data, error, isLoading } = useSWR(endpoints, async (urls) => {
-    const responses = await Promise.all(urls.map((url) => fetcher(url)));
+  const { data, error } = useSWR(endpoints, async (urls) => {
+    const responses = await Promise.all(
+      urls.map((url) => 
+        fetch(url)
+          .then(res => {
+            if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+            return res.json();
+          })
+          .catch(error => {
+            console.error(`Error fetching ${url}:`, error);
+            return { features: [] };
+          })
+      )
+    );
     return responses.reduce((acc, curr) => {
       if (curr.features) {
         acc.features = [...(acc.features || []), ...curr.features];
@@ -88,47 +100,49 @@ const GlobeViz = () => {
 
   const getPolygonColor = useCallback(
     (d: any) => {
-      const countryCode = d.id
-        ?.split("_")[0]
-        ?.toLowerCase() as keyof typeof COUNTRY_COLORS;
-      if (selectedCountry === countryCode.toUpperCase()) {
+      if (!d?.id) return "#7C9885";
+      
+      const countryCode = d.properties?.country_code?.toUpperCase();
+      if (!countryCode) return "#7C9885";
+
+      if (selectedCountry === countryCode) {
         return "#E41E3C";
       }
-      if (hoveredCountry === countryCode.toUpperCase()) {
+      if (hoveredCountry === countryCode) {
         return "#D7E5A0";
       }
       return "#7C9885";
-      // return COUNTRY_COLORS[countryCode] || "#cccccc";
     },
     [selectedCountry, hoveredCountry]
   );
 
   const getPolygonAltitude = useCallback(
     (d: any) => {
-      const countryCode = d.id
-        ?.split("_")[0]
-        ?.toLowerCase() as keyof typeof COUNTRY_COLORS;
-      if (selectedCountry === countryCode.toUpperCase()) {
+      const countryCode = d.properties?.country_code?.toUpperCase();
+      if (!countryCode) return 0.01;
+
+      if (selectedCountry === countryCode) {
         return 0.04;
       }
-      if (hoveredCountry === countryCode.toUpperCase()) {
+      if (hoveredCountry === countryCode) {
         return 0.02;
       }
       return 0.01;
-      // return COUNTRY_COLORS[countryCode] || "#cccccc";
     },
     [selectedCountry, hoveredCountry]
   );
 
   const getPolygonSideColor = useCallback(
     (d: any) => {
-      const countryCode = d.id?.split("_")[0]?.toLowerCase();
+      const countryCode = d.properties?.country_code?.toUpperCase();
       let baseColor = "#7C9885";
-      if (selectedCountry === countryCode.toUpperCase()) {
+      
+      if (selectedCountry === countryCode) {
         baseColor = "#E41E3C";
-      } else if (hoveredCountry === countryCode.toUpperCase()) {
+      } else if (hoveredCountry === countryCode) {
         baseColor = "#D7E5A0";
       }
+
       const r = parseInt(baseColor.slice(1, 3), 16);
       const g = parseInt(baseColor.slice(3, 5), 16);
       const b = parseInt(baseColor.slice(5, 7), 16);
@@ -147,70 +161,52 @@ const GlobeViz = () => {
       return;
     }
     if (args[0] === "polygon") {
-      const polygonData = args[1] as { id?: string };
-      if (!polygonData.id) return;
+      const polygonData = args[1] as { properties?: { country_code?: string } };
+      if (!polygonData?.properties?.country_code) {
+        setHoveredCountry("null");
+        return;
+      }
 
-      const countryCode = polygonData.id
-        .split("_")[0]
-        ?.substring(0, 2)
-        ?.toLowerCase();
-
-      if (!countryCode) return;
-
-      setHoveredCountry(countryCode.toUpperCase() as "in" | "out");
+      const countryCode = polygonData.properties.country_code.toUpperCase();
+      if (countryCode === "IN") {
+        setHoveredCountry("in");
+      } else if (countryCode === "OUT") {
+        setHoveredCountry("out");
+      } else {
+        setHoveredCountry(countryCode as "in" | "out" | "null");
+      }
     }
   }, []);
 
   const handleClick = useCallback(
     (...args: unknown[]) => {
-      if (args.length < 2) {
-        return;
-      }
+      if (args.length < 2) return;
 
       const secondArg = args[1];
-      if (!secondArg || typeof secondArg !== "object" || secondArg === null)
-        return;
+      if (!secondArg || typeof secondArg !== "object" || secondArg === null) return;
 
-      const polygonData = secondArg as { id?: string };
-      if (!polygonData.id) return;
+      const polygonData = secondArg as { properties?: { country_code?: string } };
+      if (!polygonData?.properties?.country_code) return;
 
-      const countryCode = polygonData.id
-        .split("_")[0]
-        ?.substring(0, 2)
-        ?.toLowerCase();
+      const countryCode = polygonData.properties.country_code.toUpperCase();
+      if (!COUNTRY_COORDINATES[countryCode as keyof typeof COUNTRY_COORDINATES]) return;
 
-      if (!countryCode) return;
-
-      setSelectedCountry(
-        countryCode.toUpperCase() as
-          | "AU"
-          | "BR"
-          | "CO"
-          | "DE"
-          | "IN"
-          | "IT"
-          | "MX"
-          | "NG"
-          | "US"
-          | "ZA"
-      );
+      setSelectedCountry(countryCode as keyof typeof COUNTRY_COORDINATES);
     },
     [setSelectedCountry]
   );
 
   useEffect(() => {
-    if (globeReady && globeRef.current) {
-      console.log("globeRef.current", globeRef.current);
-      const t = globeRef.current.getCoords(
-        COUNTRY_COORDINATES[selectedCountry][0],
-        COUNTRY_COORDINATES[selectedCountry][1],
-        1
-      );
-      const vec2 = new Vector3(t.x, t.y, t.z);
-      setPosition(new Vector3(t.x, t.y, t.z));
-      cameraRef.current.setLookAt(vec2.x, vec2.y, vec2.z, 0, 0, 0, true);
+    if (globeReady && globeRef.current && selectedCountry) {
+      const coords = COUNTRY_COORDINATES[selectedCountry];
+      if (coords) {
+        const t = globeRef.current.getCoords(coords[0], coords[1], 1);
+        const vec2 = new Vector3(t.x, t.y, t.z);
+        setPosition(new Vector3(t.x, t.y, t.z));
+        cameraRef.current?.setLookAt(vec2.x, vec2.y, vec2.z, 0, 0, 0, true);
+      }
     }
-  }, [selectedCountry]);
+  }, [selectedCountry, globeReady]);
 
   return (
     <>

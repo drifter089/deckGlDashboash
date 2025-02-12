@@ -1,4 +1,5 @@
-const BASE_URL = "https://geo.powernetzero.org/geoserver/GIS_Dashboard/ows";
+const API_BASE_URL = "/api/geography";
+
 
 export const toLowerCase = (str) => str.toLowerCase();
 
@@ -14,13 +15,17 @@ export const COUNTRY_COLORS = {
   za: "#DC143C", // Crimson
 };
 
-export const getGeoJsonData = (countryCode) => ({
-  buses: `${BASE_URL}?service=WFS&version=1.0.0&request=GetFeature&typeName=GIS_Dashboard%3Abuses_${countryCode.toLowerCase()}&maxFeatures=5000&outputFormat=application%2Fjson`,
-  lines: `${BASE_URL}?service=WFS&version=1.0.0&request=GetFeature&typeName=GIS_Dashboard%3Alines_${countryCode.toLowerCase()}&maxFeatures=5000&outputFormat=application%2Fjson`,
-  countryView: `${BASE_URL}?service=WFS&version=1.0.0&request=GetFeature&typeName=GIS_Dashboard%3A${countryCode.toLowerCase()}_country_view&maxFeatures=10000&outputFormat=application%2Fjson`,
-  regions_2021: `${BASE_URL}?service=WFS&version=1.0.0&request=GetFeature&typeName=GIS_Dashboard%3Aregions_${countryCode.toLowerCase()}_2021&maxFeatures=10000&outputFormat=application%2Fjson`,
-  regions_2050: `${BASE_URL}?service=WFS&version=1.0.0&request=GetFeature&typeName=GIS_Dashboard%3Aregions_${countryCode.toLowerCase()}_2050&maxFeatures=10000&outputFormat=application%2Fjson`,
-});
+export const getGeoJsonData = (countryCode) => {
+  const code = countryCode.toLowerCase();
+  return {
+    buses: `${API_BASE_URL}/buses/${code}`,
+    lines: `${API_BASE_URL}/lines/${code}`,
+    countryView: `${API_BASE_URL}/countryView/${code}`,
+    regions: `${API_BASE_URL}/regions/${code}`,
+    regions_2021: `${API_BASE_URL}/regions/${code}?year=2021`,
+    regions_2050: `${API_BASE_URL}/regions/${code}?year=2050`
+  };
+};
 
 export const COUNTRY_S_NOM_RANGES = {
   BR: { min: 231.25476357255866, max: 87594.814965592, bussize: 20 },
@@ -76,46 +81,16 @@ export const COUNTRY_VIEW_CONFIG = {
 };
 
 export const COUNTRY_BOUNDS = {
-  AU: [
-    [113.338953078, -43.6345972634],
-    [153.569469029, -10.6681857235],
-  ],
-  BR: [
-    [-73.9872354804, -33.7683777809],
-    [-34.7299934555, 5.24448639569],
-  ],
-  CO: [
-    [-78.9909352282, -4.29818694419],
-    [-66.8763258531, 12.4373031682],
-  ],
-  DE: [
-    [5.98865807458, 47.3024876979],
-    [15.0169958839, 54.983104153],
-  ],
-  IN: [
-    [68.1766451354, 7.96553477623],
-    [97.4025614766, 35.4940095078],
-  ],
-  IT: [
-    [6.7499552751, 36.619987291],
-    [18.4802470232, 47.1153931748],
-  ],
-  MX: [
-    [-118.3649820989, 14.5321824761],
-    [-86.7235489749, 32.7187629611],
-  ],
-  NG: [
-    [2.6917863124, 4.2790553552],
-    [14.6800013683, 13.8659239771],
-  ],
-  US: [
-    [-178.334698, 18.910361],
-    [-66.94524, 71.352561],
-  ],
-  ZA: [
-    [16.3449768409, -34.8191663551],
-    [32.830120477, -22.1265453832],
-  ],
+  AU: [[113.338953078, -43.6345972634], [153.569469029, -10.6681857235]],
+  BR: [[-73.9872354804, -33.7683777809], [-34.7299934555, 5.24448639569]],
+  CO: [[-78.9909352282, -4.29818694419], [-66.8763258531, 12.4373031682]],
+  DE: [[5.98865807458, 47.3024876979], [15.0169958839, 54.983104153]],
+  IN: [[68.1766451354, 7.96553477623], [97.4025614766, 35.4940095078]],
+  IT: [[6.7499552751, 36.619987291], [18.4802470232, 47.1153931748]],
+  MX: [[-118.3649820989, 14.5321824761], [-86.7235489749, 32.7187629611]],
+  NG: [[2.6917863124, 4.2790553552], [14.6800013683, 13.8659239771]],
+  US: [[-178.334698, 18.910361], [-66.94524, 71.352561]],
+  ZA: [[16.3449768409, -34.8191663551], [32.830120477, -22.1265453832]],
 };
 
 export const COUNTRY_NAMES = {

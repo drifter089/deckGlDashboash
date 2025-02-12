@@ -86,9 +86,6 @@ export function CarrierCapacityGeneralPie({
           };
         });
 
-      console.log("dataArray", dataArray);
-      console.log("transformedData", transformedData);
-
       setChartData(transformedData);
     }
   }, [data, costField]);
@@ -132,7 +129,7 @@ export function CarrierCapacityGeneralPie({
                               typeof value === "number"
                                 ? value.toFixed(2)
                                 : Number(value).toFixed(2)
-                            } MW`}</span>
+                            } GW`}</span>
                           </div>
                           <div className="flex gap-2">
                             <span className="font-bold">percentage</span>
@@ -175,7 +172,7 @@ export function CarrierCapacityGeneralPie({
                             y={(viewBox.cy || 0) + 24}
                             className="fill-muted-foreground"
                           >
-                            MW
+                            GW
                           </tspan>
                         </text>
                       );

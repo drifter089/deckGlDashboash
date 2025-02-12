@@ -97,62 +97,62 @@ export default function SideBySide({ mode }: SideBySideProps) {
   const [layer2021, setLayer2021] = useState<GeoJsonLayer[]>([]);
   const [layer2050, setLayer2050] = useState<GeoJsonLayer[]>([]);
 
-  const getColorForParameter = (value: number, parameter: string) => {
+  const getColorForParameter = useCallback((value: number, parameter: string) => {
     type ColorScale = Array<[number, [number, number, number, number]]>;
 
     const scales: Record<string, ColorScale> = {
       cf: [
-        [0, [65, 182, 196, 180]], // 0-10%
-        [10, [160, 170, 120, 180]], // 10-25%
-        [25, [254, 153, 41, 180]], // 25-40%
-        [40, [245, 110, 40, 180]], // 40-60%
-        [60, [239, 59, 44, 180]], // >60%
+        [0, [65, 182, 196, 180]],
+        [10, [160, 170, 120, 180]],
+        [25, [254, 153, 41, 180]],
+        [40, [245, 110, 40, 180]],
+        [60, [239, 59, 44, 180]],
       ],
       crt: [
-        [0, [65, 171, 93, 180]], // 0-5%
-        [5, [160, 170, 90, 180]], // 5-15%
-        [15, [254, 153, 41, 180]], // 15-30%
-        [30, [245, 110, 40, 180]], // 30-50%
-        [50, [239, 59, 44, 180]], // >50%
+        [0, [65, 171, 93, 180]],
+        [5, [160, 170, 90, 180]],
+        [15, [254, 153, 41, 180]],
+        [30, [245, 110, 40, 180]],
+        [50, [239, 59, 44, 180]],
       ],
       usdpt: [
-        [0, [239, 59, 44, 180]], // 0-20%
-        [20, [254, 153, 41, 180]], // 20-40%
-        [40, [160, 170, 90, 180]], // 40-60%
-        [60, [65, 171, 93, 180]], // 60-80%
-        [80, [65, 182, 196, 180]], // >80%
+        [0, [239, 59, 44, 180]],
+        [20, [254, 153, 41, 180]],
+        [40, [160, 170, 90, 180]],
+        [60, [65, 171, 93, 180]],
+        [80, [65, 182, 196, 180]],
       ],
     };
 
     const scale = scales[parameter as keyof typeof scales] || scales.cf;
 
-    // Linear interpolation between colors
     for (let i = 1; i < scale.length; i++) {
       if (value <= scale[i][0]) {
         const t = (value - scale[i - 1][0]) / (scale[i][0] - scale[i - 1][0]);
-        const startColor = scale[i - 1][1] as [number, number, number, number];
-        const endColor = scale[i][1] as [number, number, number, number];
+        const startColor = scale[i - 1][1];
+        const endColor = scale[i][1];
         return startColor.map((start, j) =>
           Math.round(start + t * (endColor[j] - start))
         ) as [number, number, number, number];
       }
     }
     return scale[scale.length - 1][1];
-  };
+  }, []);
 
-  const filterAndColorFeatures = (
-    feature: any
-  ): [number, number, number, number] => {
-    const generator = feature.properties.Generator?.toLowerCase() || "";
-    const type = generator.split(" ").slice(-1)[0];
+  const filterAndColorFeatures = useCallback(
+    (feature: any): [number, number, number, number] => {
+      const generator = feature.properties.Generator?.toLowerCase() || "";
+      const type = generator.split(" ").slice(-1)[0];
 
-    if (type !== selectedRenewableType) {
-      return [0, 0, 0, 0]; // Transparent if not selected type
-    }
+      if (type !== selectedRenewableType) {
+        return [0, 0, 0, 0];
+      }
 
-    const paramValue = feature.properties[selectedParameter];
-    return getColorForParameter(paramValue || 0, selectedParameter);
-  };
+      const paramValue = feature.properties[selectedParameter];
+      return getColorForParameter(paramValue || 0, selectedParameter);
+    },
+    [selectedRenewableType, selectedParameter, getColorForParameter]
+  );
 
   useEffect(() => {
     const commonProps = {
@@ -171,43 +171,50 @@ export default function SideBySide({ mode }: SideBySideProps) {
       updateTriggers: {
         getFillColor: [selectedRenewableType, selectedParameter],
       },
-      onHover: (info: any) => {
-        if (info.object) {
-        }
-      },
     };
 
     const urls = getGeoJsonData(selectedCountry);
 
-    // Fetch 2021 data
-    fetch(urls.regions_2021)
-      .then((response) => response.json())
-      .then((data) => {
+    const fetchData = async () => {
+      try {
+        // Fetch 2021 data with optimizations
+        const response2021 = await fetch(`${urls.regions_2021}&simplification=0.01&pageSize=10000`);
+        if (!response2021.ok) {
+          throw new Error(`HTTP error! status: ${response2021.status}`);
+        }
+        const data2021 = await response2021.json();
         setLayer2021([
           new GeoJsonLayer({
-            id: "regions-2021",
-            data,
+            id: 'regions-2021',
+            data: data2021,
             ...commonProps,
           }),
         ]);
-      });
 
-    // Fetch 2050 data
-    fetch(urls.regions_2050)
-      .then((response) => response.json())
-      .then((data) => {
+        // Fetch 2050 data with optimizations
+        const response2050 = await fetch(`${urls.regions_2050}&simplification=0.01&pageSize=10000`);
+        if (!response2050.ok) {
+          throw new Error(`HTTP error! status: ${response2050.status}`);
+        }
+        const data2050 = await response2050.json();
         setLayer2050([
           new GeoJsonLayer({
-            id: "regions-2050",
-            data,
+            id: 'regions-2050',
+            data: data2050,
             ...commonProps,
           }),
         ]);
-      });
-  }, [selectedCountry, selectedRenewableType, selectedParameter]);
+      } catch (error) {
+        // Set empty layers on error to avoid UI breaking
+        setLayer2021([]);
+        setLayer2050([]);
+      }
+    };
+
+    fetchData();
+  }, [selectedCountry, selectedRenewableType, selectedParameter, filterAndColorFeatures]);
 
   useEffect(() => {
-    // Update viewState when country changes
     setViewState({
       ...viewState,
       latitude: COUNTRY_COORDINATES[selectedCountry][0],

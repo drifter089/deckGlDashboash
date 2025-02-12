@@ -75,9 +75,6 @@ export function Co2EmmisionsPie({ data, costField }: Props) {
           };
         });
 
-      console.log("dataArray", dataArray);
-      console.log("transformedData", transformedData);
-
       setChartData(transformedData);
     }
   }, [data, costField]);
