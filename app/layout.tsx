@@ -7,6 +7,7 @@ import { NavigationMenuDemo } from "@/components/TopNavBar/TopNavBar";
 import { VisualizationProvider } from "@/components/visualization-context";
 import { NetworkViewProvider } from "@/components/network-view-context";
 import { TransitionProvider } from "@/components/TransitionProvider";
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -52,6 +53,7 @@ export default function RootLayout({
           </ThemeProvider>
         </TransitionProvider>
       </body>
+      <GoogleAnalytics gaId="G-5LBLD28VP1" />
     </html>
   );
 }
