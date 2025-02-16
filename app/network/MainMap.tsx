@@ -14,7 +14,7 @@ import {
   COUNTRY_VIEW_CONFIG,
 } from "@/utilities/CountryConfig/Link";
 import { GeoJsonLayer } from "@deck.gl/layers";
-import BottomDrawer from "../../components/BottomDrawer";
+import BottomDrawer from "./popups/BottomDrawer";
 import MySideDrawer from "./popups/SideDrawer";
 import { useTheme } from "next-themes";
 import type { Feature, Geometry } from "geojson";
@@ -30,7 +30,7 @@ import {
   getTotalDemandChartsData,
 } from "./chartData";
 import { WebMercatorViewport } from "@deck.gl/core";
-import MapLegend from "./components/MapLegend";
+import MapLegend from "./popups/MapLegend";
 import { useCountry } from "@/components/country-context";
 import { Button } from "@/components/ui/button";
 import { useNetworkView } from "@/components/network-view-context";

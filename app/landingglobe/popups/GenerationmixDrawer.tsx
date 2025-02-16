@@ -91,29 +91,25 @@ const GenerationMixBottomDrawer = ({
               net-zero target for {selectedCountry}
             </DrawerDescription>
           </DrawerHeader>
-          <div className="w-[100%] lg:w-[50%] border-t-2 mt-4 border-r-2 p-8">
-            <h2 className="w-full text-4xl font-semibold text-card-foreground text-center mb-8">
+          <div className="flex flex-col flex-wrap gap-8 justify-center align-middle items-center w-[100%] lg:w-[50%] p-8 border-t-2 mt-4 border-r-2 mx-auto">
+            <h2 className="w-full text-4xl font-semibold text-card-foreground text-center">
               Current Generation (2021)
             </h2>
             <p className="text-muted-foreground text-center mb-6">
               Distribution of energy generation by technology type in{" "}
               {selectedCountry}'s current energy mix
             </p>
-            <div className="w-full max-w-3xl mx-auto">
-              <GenerationMixGeneral data={generationComparisonState2021} />
-            </div>
+            <GenerationMixGeneral data={generationComparisonState2021} />
           </div>
-          <div className="w-[100%] lg:w-[50%] border-t-2 mt-4 p-8">
-            <h2 className="w-full text-4xl font-semibold text-card-foreground text-center mb-8">
+          <div className="flex flex-col flex-wrap gap-8 justify-center align-middle items-center w-[100%] lg:w-[50%] p-8 border-t-2 mt-4 border-r-2 mx-auto">
+            <h2 className="w-full text-4xl font-semibold text-card-foreground text-center">
               Net-Zero Target (2050)
             </h2>
             <p className="text-muted-foreground text-center mb-6">
               Projected energy generation distribution to achieve carbon
               neutrality
             </p>
-            <div className="w-full max-w-3xl mx-auto">
-              <GenerationMixGeneral data={generationComparisonState2050} />
-            </div>
+            <GenerationMixGeneral data={generationComparisonState2050} />
           </div>
           <DrawerFooter className="w-full border-t">
             <DrawerClose>

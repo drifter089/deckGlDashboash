@@ -20,7 +20,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import useSWR from "swr";
 import { Co2EmmisionsPie } from "@/components/Charts/Co2EmmisionsPie";
-import GenerationMixBottomDrawer from "./BottomDrawer";
+import GenerationMixBottomDrawer from "./GenerationmixDrawer";
 import SystemCostDrawer from "./SystemCostDrawer";
 import CapacityComparisionDrawer from "./CapacityComparisionDrawer";
 

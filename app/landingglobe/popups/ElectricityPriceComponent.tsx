@@ -7,11 +7,23 @@ import { useCountry } from "@/components/country-context";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { CircleFlag } from "react-circle-flags";
+import { GenerationMixGeneral } from "@/components/Charts/GenerationPie";
+import {
+  ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+import { GenerationMixchartConfigSmall } from "@/utilities/GenerationMixChartConfig";
+import { Label, Pie, PieChart } from "recharts";
+import { GenerationMixglobe } from "./GenerationPie";
 
 interface DrawerData {
   electricityPrice2050: number;
   investmentPerCO2: number;
   electricityPrice2021: number;
+  generationMix: any;
 }
 
 const ElectricityPriceComponent = ({
@@ -19,14 +31,13 @@ const ElectricityPriceComponent = ({
 }: {
   hoveredCountry: string;
 }) => {
-  const { theme, setTheme } = useTheme();
-  const pathname = usePathname();
   const contentRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<DrawerData>({
     electricityPrice2050: 0,
     investmentPerCO2: 0,
     electricityPrice2021: 0,
+    generationMix: [],
   });
 
   const [mouse, ref] = useMouse();
@@ -37,7 +48,7 @@ const ElectricityPriceComponent = ({
     const { x, y } = mouse;
     gsap.to(contentRef.current, {
       delay: 0.08,
-      x: x * 0.5,
+      x: x,
       y: y * 0.5,
     });
   }, [mouse]);
@@ -48,6 +59,7 @@ const ElectricityPriceComponent = ({
         electricityPrice2050: 0,
         investmentPerCO2: 0,
         electricityPrice2021: 0,
+        generationMix: [],
       });
       setLoading(false);
       return;
@@ -59,6 +71,7 @@ const ElectricityPriceComponent = ({
         fetch(`/api/electricity_prices/${hoveredCountry}/2050`),
         fetch(`/api/investment_per_co2_reduced/${hoveredCountry}/2050`),
         fetch(`/api/electricity_prices/${hoveredCountry}/2021`),
+        fetch(`/api/generation_mix/${hoveredCountry}/2050`),
       ]);
 
       const failedResponses = responses.filter((r) => !r.ok);
@@ -70,6 +83,7 @@ const ElectricityPriceComponent = ({
         electricityPricesData2050,
         investmentPerCO2Data,
         electricityPriceData2021,
+        generationMixData2050,
       ] = await Promise.all(responses.map((r) => r.json()));
 
       const processedData: DrawerData = {
@@ -83,6 +97,7 @@ const ElectricityPriceComponent = ({
         electricityPrice2021:
           parseFloat(electricityPriceData2021.data?.[0]?.electricity_price) ||
           0,
+        generationMix: generationMixData2050.data,
       };
 
       setData(processedData);
@@ -91,6 +106,7 @@ const ElectricityPriceComponent = ({
         electricityPrice2050: 0,
         investmentPerCO2: 0,
         electricityPrice2021: 0,
+        generationMix: [],
       });
     } finally {
       setLoading(false);
@@ -109,13 +125,23 @@ const ElectricityPriceComponent = ({
       });
     } else {
       console.log(hoveredCountry);
-      gsap.to(contentRef.current, {
-        width: "35vw",
-        height: "15vh",
-        opacity: 1,
-        duration: 0.3,
-        delay: 0.08,
-      });
+      if (window.innerWidth <= 768) {
+        gsap.to(contentRef.current, {
+          width: "12rem",
+          height: "16rem",
+          opacity: 1,
+          duration: 0.3,
+          delay: 0.08,
+        });
+      } else {
+        gsap.to(contentRef.current, {
+          width: "25rem",
+          height: "28rem",
+          opacity: 1,
+          duration: 0.3,
+          delay: 0.08,
+        });
+      }
     }
   }, [hoveredCountry]);
 
@@ -125,38 +151,30 @@ const ElectricityPriceComponent = ({
 
   return (
     <Card
-      className={`fixed top-0 left-0  h-0 w-0 z-40  mx-auto text-accent-foreground bg-background text-center opacity-1 overflow-hidden`}
+      className={`fixed top-0 left-0  h-0 w-0 z-40  mx-auto text-accent-foreground bg-background text-center opacity-1 overflow-hidden border-border border-2 m-2`}
       ref={contentRef}
     >
       {!loading && (
-        <div className="w-full h-full grid grid-cols-12">
-          <div className="col-span-2 flex flex-col justify-center my-5 pl-3">
-            <CircleFlag
-              countryCode={hoveredCountry.toLowerCase()}
-              height={50}
-              className="h-18 w-18"
-            />
+        <div className="w-full h-full grid grid-cols-11">
+          <CircleFlag
+            countryCode={hoveredCountry.toLowerCase()}
+            height={50}
+            className="pt-1 w-full aspect-square col-span-11 h-20 mx-auto md:h-auto  md:col-span-2 "
+          />
+          <div className="col-span-11 md:col-span-3">
+            <p>2021</p>
+            {data.electricityPrice2021.toFixed(2)} €/MWh{" "}
           </div>
-          <div className="col-span-3 px-2 flex flex-col justify-center my-5">
-            <p className="text-2xl  font-bold tracking-tight">
-              {data.electricityPrice2021.toFixed(2)}{" "}
-              <span className="text-lg font-normal ml-2">€/MWh</span>
-            </p>
-            <h1 className="text-2xl font-bold">2021</h1>
+          <div className="col-span-11 md:col-span-3">
+            <p>Investment Required</p>
+            {data.investmentPerCO2.toFixed(2)} €/tCO
           </div>
-          <div className="col-span-4 border-x-2 px-3 flex flex-col justify-center my-5">
-            <p className="text-2xl font-bold tracking-tight">
-              {data.investmentPerCO2.toFixed(2)}{" "}
-              <span className="text-lg font-normal ml-2">€/tCO2</span>
-            </p>
-            <h1 className="text-2xl font-bold">Investment Required</h1>
+          <div className="col-span-11 md:col-span-3">
+            <p>2050</p>
+            {data.electricityPrice2050.toFixed(2)} €/MWh{" "}
           </div>
-          <div className="col-span-3 px-2 flex flex-col justify-center my-5">
-            <p className="text-2xl font-bold tracking-tight">
-              {data.electricityPrice2050.toFixed(2)}{" "}
-              <span className="text-lg font-normal ml-2">€/MWh</span>
-            </p>
-            <h1 className="text-2xl font-bold">2050</h1>
+          <div className="hidden md:block md:col-span-11">
+            <GenerationMixglobe data={data.generationMix} />
           </div>
         </div>
       )}

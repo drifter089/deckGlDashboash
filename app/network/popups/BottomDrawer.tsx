@@ -14,11 +14,11 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { GenerationMixPieChart } from "@/components/Charts/GenerationMixPieChart";
 import { InstalledCapacityPieChart } from "@/components/Charts/InstalledCapacityPieChart";
-import useSWR from 'swr';
+import useSWR from "swr";
 import { useTheme } from "next-themes";
 import { InstalledCapacityBarChartStacked } from "@/components/Charts/InstalledCapacityBarChartstacked";
 import { GenerationMixBarChartStacked } from "@/components/Charts/GenerationMixBarChartStacked";
-import { ScrollBar } from "./ui/scroll-area";
+import { ScrollBar } from "../../../components/ui/scroll-area";
 
 type Props = {
   selectedCountry: string;
@@ -95,7 +95,7 @@ const BottomDrawer = ({
           <InstalledCapacityPieChart data={capacityComparisonRef} />
           <DrawerFooter className="w-full border-t">
             <DrawerClose>
-              <Button>CLOSE</Button>
+              <Button className="w-[90%]">CLOSE</Button>
             </DrawerClose>
           </DrawerFooter>
           {/* <ScrollBar className="scrollbar-thumb-rounded-full scrollbar-track-rounded-full scrollbar scrollbar-thumb-sky-700 scrollbar-track-sky-300" /> */}

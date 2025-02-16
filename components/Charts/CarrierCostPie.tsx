@@ -92,7 +92,7 @@ export function CarrierCostGeneral({
 
   return (
     <>
-      <Card className="w-[26rem]">
+      <Card className="w-full md:w-[26rem]">
         <CardHeader>
           <CardTitle>{heading || "System and Investment cost"}</CardTitle>
           <CardDescription>
@@ -102,7 +102,7 @@ export function CarrierCostGeneral({
         <CardContent>
           <ChartContainer
             config={GenerationMixchartConfig}
-            className="aspect-square"
+            className="h-[28rem] w-full md:aspect-square"
           >
             <PieChart>
               <ChartTooltip
@@ -133,7 +133,9 @@ export function CarrierCostGeneral({
                           </div>
                           <div className="flex gap-2">
                             <span className="font-bold">percentage</span>
-                            <span>{`${item.payload.percentage.toFixed(1)}%`}</span>
+                            <span>{`${item.payload.percentage.toFixed(
+                              1
+                            )}%`}</span>
                           </div>
                         </div>
                       </>

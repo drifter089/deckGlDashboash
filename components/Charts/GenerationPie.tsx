@@ -82,7 +82,7 @@ export function GenerationMixGeneral({ data }: Props) {
 
   return (
     <>
-      <Card className="w-[30rem] mx-auto">
+      <Card className="w-full md:w-[26rem]">
         <CardHeader>
           <CardTitle>Generation Mix</CardTitle>
           <CardDescription>PyPSA Generation by Technology</CardDescription>
@@ -90,7 +90,7 @@ export function GenerationMixGeneral({ data }: Props) {
         <CardContent>
           <ChartContainer
             config={GenerationMixchartConfigSmall}
-            className="aspect-square"
+            className="h-[26rem] w-full md:aspect-square"
           >
             <PieChart>
               <ChartTooltip
