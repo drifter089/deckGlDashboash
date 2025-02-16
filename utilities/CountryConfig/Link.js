@@ -53,6 +53,20 @@ export const LINE_WIDTH_RANGE = {
   DE: { min: 245.7780095940237, max: 46094.54852658827 },
 };
 
+// Country configurations for bus sizes
+export const COUNTRY_BUS_CONFIGS = {
+  US: { minRadius: 1000, maxRadius: 40000, zoomBase: 1.2 },
+  MX: { minRadius: 5000, maxRadius: 25000, zoomBase: 1.2 },
+  BR: { minRadius: 15000, maxRadius: 35000, zoomBase: 1.2 },
+  DE: { minRadius: 4000, maxRadius: 15000, zoomBase: 1.2 },
+  CO: { minRadius: 5000, maxRadius: 10000, zoomBase: 1.2 },
+  AU: { minRadius: 3000, maxRadius: 10000, zoomBase: 1.1 },
+  IN: { minRadius: 2500, maxRadius: 20000, zoomBase: 1.2 },
+  ZA: { minRadius: 5000, maxRadius: 20000, zoomBase: 1.2 },
+  IT: { minRadius: 3000, maxRadius: 5000, zoomBase: 1.2 },
+  NG: { minRadius: 3000, maxRadius: 5000, zoomBase: 1.2 },
+} ;
+
 export const COUNTRY_COORDINATES = {
   // lat long
   AU: [-25.2744, 133.7751],

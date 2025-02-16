@@ -18,13 +18,10 @@ export async function GET(
   try {
     const result = await pool.query(
       `
-        SELECT "Generator", "p_nom", "p_nom_opt", "carrier", "bus", "country_code"
-        FROM public.generators
-        WHERE "carrier" != 'csp' AND "country_code" = $1;
-      `,
-      [country]
+      SELECT "Generator", "p_nom", "p_nom_opt", "carrier", "bus", "country_code"
+      FROM public.generators_${country.toLowerCase()};
+      `
     );
-
     return NextResponse.json({ data: result.rows });
   } catch (error) {
     return NextResponse.json({ error: "Error fetching data" }, { status: 500 });

@@ -1,6 +1,8 @@
 import React from "react";
-import { COUNTRY_BUS_CONFIGS } from "../MainMap";
-import { COUNTRY_S_NOM_RANGES } from "@/utilities/CountryConfig/Link";
+import {
+  COUNTRY_S_NOM_RANGES,
+  COUNTRY_BUS_CONFIGS,
+} from "@/utilities/CountryConfig/Link";
 
 interface MapLegendProps {
   country: string;

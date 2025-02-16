@@ -162,25 +162,16 @@ export function ChartRadial({ data, valueKey, title }: ChartRadialProps) {
 
   return (
     <>
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-        <CardDescription>Total: {totalValue.toFixed(2)} MW</CardDescription>
-      </CardHeader>
-      <CardContent className="p-0">
-        <ChartContainer
-          config={chartConfig}
-          className="w-full min-h-[40vh] h-auto p-0 self-start"
+      <ChartContainer config={chartConfig} className="w-full aspect-square">
+        <RadialBarChart
+          data={processedData}
+          innerRadius="20%"
+          outerRadius="100%"
+          startAngle={180}
+          endAngle={-180}
+          barSize={15}
         >
-          <RadialBarChart
-            data={processedData}
-            innerRadius="20%"
-            outerRadius="100%"
-            startAngle={180}
-            endAngle={-180}
-            barSize={15}
-            className="aspect-square self-start translate-y-[-15%]"
-          >
-            {/* <ChartTooltip
+          {/* <ChartTooltip
               content={({ payload }) => {
                 if (payload && payload[0]) {
                   const data = payload[0].payload as ProcessedDataItem;
@@ -198,68 +189,63 @@ export function ChartRadial({ data, valueKey, title }: ChartRadialProps) {
                 return null;
               }}
             /> */}
-            <PolarGrid gridType="circle" />
-            <ChartTooltip
-              content={
-                <ChartTooltipContent
-                  labelKey="carrier"
-                  formatter={(value, name, item, index) => {
-                    console.log(
-                      "RadialBarChart - ChartTooltipContent - formatter:",
-                      { value, name, item, index }
-                    );
-                    return (
-                      <>
-                        <div
-                          className="h-10 w-2.5 shrink-0 rounded-[2px]"
-                          style={{
-                            backgroundColor: item.payload.fill,
-                          }}
-                        />
-                        <div className="flex flex-col gap-1">
-                          <div className="flex gap-2">
-                            <span>{`${
-                              typeof item.payload.actualValue === "number"
-                                ? item.payload.actualValue.toFixed(2)
-                                : Number(value).toFixed(2)
-                            } MW`}</span>
-                          </div>
-                          <span>{`${item.payload.percentage}%`}</span>
+          <PolarGrid gridType="circle" />
+          <ChartTooltip
+            content={
+              <ChartTooltipContent
+                labelKey="carrier"
+                formatter={(value, name, item, index) => {
+                  return (
+                    <>
+                      <div
+                        className="h-10 w-2.5 shrink-0 rounded-[2px]"
+                        style={{
+                          backgroundColor: item.payload.fill,
+                        }}
+                      />
+                      <div className="flex flex-col gap-1">
+                        <div className="flex gap-2">
+                          <span>{`${
+                            typeof item.payload.actualValue === "number"
+                              ? item.payload.actualValue.toFixed(2)
+                              : Number(value).toFixed(2)
+                          } MW`}</span>
                         </div>
-                      </>
-                    );
-                  }}
-                />
-              }
-            />
-            <RadialBar
-              dataKey="displayValue"
-              background
-              cornerRadius={5}
-              label={{
-                position: "insideStart",
-                fill: "#fff",
-                fontSize: 10,
-                formatter: (value: number, entry: any) => {
-                  if (!entry?.payload?.percentage) return "";
-                  const percentage = Number(entry.payload.percentage);
-                  return percentage > 5 ? `${percentage.toFixed(1)}%` : "";
-                },
-              }}
-            />
+                        <span>{`${item.payload.percentage}%`}</span>
+                      </div>
+                    </>
+                  );
+                }}
+              />
+            }
+          />
+          <RadialBar
+            dataKey="displayValue"
+            background
+            cornerRadius={5}
+            label={{
+              position: "insideStart",
+              fill: "#fff",
+              fontSize: 10,
+              formatter: (value: number, entry: any) => {
+                if (!entry?.payload?.percentage) return "";
+                const percentage = Number(entry.payload.percentage);
+                return percentage > 5 ? `${percentage.toFixed(1)}%` : "";
+              },
+            }}
+          />
 
-            <ChartLegend
-              wrapperStyle={{ paddingBottom: 0, marginBottom: 0 }}
-              content={
-                <ChartLegendContent
-                  className="flex-wrap translate-y-10"
-                  nameKey="carrier"
-                ></ChartLegendContent>
-              }
-            />
-          </RadialBarChart>
-        </ChartContainer>
-      </CardContent>
+          <ChartLegend
+            wrapperStyle={{ paddingBottom: 0, marginBottom: 0 }}
+            content={
+              <ChartLegendContent
+                className="flex-wrap translate-y-10"
+                nameKey="carrier"
+              ></ChartLegendContent>
+            }
+          />
+        </RadialBarChart>
+      </ChartContainer>
     </>
   );
 }

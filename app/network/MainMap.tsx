@@ -12,13 +12,10 @@ import {
   getGeoJsonData,
   COUNTRY_S_NOM_RANGES,
   COUNTRY_VIEW_CONFIG,
+  COUNTRY_BUS_CONFIGS,
 } from "@/utilities/CountryConfig/Link";
 import { GeoJsonLayer } from "@deck.gl/layers";
-import BottomDrawer from "../../components/BottomDrawer";
-import MySideDrawer from "./popups/SideDrawer";
 import { useTheme } from "next-themes";
-import type { Feature, Geometry } from "geojson";
-import type { PickingInfo } from "deck.gl";
 import {
   getBusChartsData,
   getCountryCapacityChartsData,
@@ -30,10 +27,8 @@ import {
   getTotalDemandChartsData,
 } from "./chartData";
 import { WebMercatorViewport } from "@deck.gl/core";
-import MapLegend from "./components/MapLegend";
 import { useCountry } from "@/components/country-context";
-import { Button } from "@/components/ui/button";
-import { useNetworkView } from "@/components/network-view-context";
+import BusesTooltip from "./popups/BusesTooltip";
 
 const INITIAL_VIEW_STATE: MapViewState = {
   latitude: 49.254,
@@ -77,10 +72,6 @@ function normalizeSnom(
   }
 }
 
-function getBusSize(country: keyof typeof COUNTRY_S_NOM_RANGES) {
-  return COUNTRY_S_NOM_RANGES[country].bussize;
-}
-
 // Bus properties interface
 interface BusProperties extends BlockProperties {
   Bus: string;
@@ -99,20 +90,6 @@ interface BusProperties extends BlockProperties {
   sub_network: string | null;
   country_code: string;
 }
-
-// Country configurations for bus sizes
-export const COUNTRY_BUS_CONFIGS = {
-  US: { minRadius: 1000, maxRadius: 40000, zoomBase: 1.2 },
-  MX: { minRadius: 5000, maxRadius: 25000, zoomBase: 1.2 },
-  BR: { minRadius: 15000, maxRadius: 35000, zoomBase: 1.2 },
-  DE: { minRadius: 4000, maxRadius: 15000, zoomBase: 1.2 },
-  CO: { minRadius: 5000, maxRadius: 10000, zoomBase: 1.2 },
-  AU: { minRadius: 3000, maxRadius: 10000, zoomBase: 1.1 },
-  IN: { minRadius: 2500, maxRadius: 20000, zoomBase: 1.2 },
-  ZA: { minRadius: 5000, maxRadius: 20000, zoomBase: 1.2 },
-  IT: { minRadius: 3000, maxRadius: 5000, zoomBase: 1.2 },
-  NG: { minRadius: 3000, maxRadius: 5000, zoomBase: 1.2 },
-} as const;
 
 // Define render parameters interface
 interface CustomRenderParameters extends RenderPassParameters {
@@ -136,10 +113,9 @@ export default function MainMap() {
 
   const { selectedCountry, setSelectedCountry } = useCountry();
 
-  const { networkView, setNetworkView } = useNetworkView();
-
   const [selectedPointID, setSelectedPointID] = useState<string | null>(null);
   const [hoverPointID, setHoverPointID] = useState<string | null>(null);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
 
   const [selectedLineID, setSelectedLineID] = useState<string | null>(null);
   const [hoverLineID, setHoverLineID] = useState<string | null>(null);
@@ -148,16 +124,6 @@ export default function MainMap() {
     useState<MapViewState>(INITIAL_VIEW_STATE);
 
   const [open, setOpen] = useState<boolean>(false);
-
-  const [selectedBusData, setSelectedBusData] = useState<{
-    busId: string;
-    countryCode: string;
-  } | null>(null);
-
-  const [selectedLineData, setSelectedLineData] = useState<{
-    busId: string;
-    countryCode: string;
-  } | null>(null);
 
   const [zoomLevel, setZoomLevel] = useState(4);
 
@@ -296,7 +262,7 @@ export default function MainMap() {
         lineWidthScale: 20,
         getLineColor: [228, 30, 60, 150], // Last value is alpha (0-255)
         getFillColor: [228, 30, 60, 150], // Last value is alpha (0-255)
-        getLineWidth: (d) => {
+        getLineWidth: (d: any) => {
           const baseWidth = normalizeSnom(
             d.properties.s_nom,
             selectedCountry,
@@ -347,20 +313,14 @@ export default function MainMap() {
           const busId = info.object.properties.Bus;
           if (selectedPointID === busId) {
             setSelectedPointID(null);
-            setSelectedBusData(null);
-            setOpen(false);
           } else {
             setSelectedPointID(busId);
-            setSelectedBusData({
-              busId: busId,
-              countryCode: selectedCountry,
-            });
             flyToGeometry(info.object.geometry.coordinates);
-            setOpen(true);
           }
         },
         onHover: (info) => {
-          setHoverPointID(info.object ? info.object.id : null);
+          setPosition({ x: info.x || 0, y: info.y || 0 });
+          setHoverPointID(info.object ? info.object.properties.Bus : null);
         },
         // getFillColor: [72, 123, 182],
         getLineColor: [124, 152, 133],
@@ -385,11 +345,6 @@ export default function MainMap() {
       }),
     ];
   }, [selectedCountry, busCapacities, isLoading, zoomLevel]);
-
-  const visibleLayers = (networkView: boolean) => {
-    const allLayers = MakeLayers();
-    return networkView ? allLayers.slice(5) : [...allLayers];
-  };
 
   useEffect(() => {
     const countryCoordinates = COUNTRY_COORDINATES[selectedCountry];
@@ -437,7 +392,7 @@ export default function MainMap() {
     <>
       <div onContextMenu={(evt) => evt.preventDefault()}>
         <DeckGL
-          layers={visibleLayers(networkView)}
+          layers={MakeLayers()}
           initialViewState={initialViewState}
           controller={true}
           ref={DeckRef}
@@ -450,14 +405,19 @@ export default function MainMap() {
             }
             styleDiffing={false}
           />
+          <div
+            style={{
+              position: "fixed",
+              zIndex: 100,
+              pointerEvents: "none",
+              left: position.x,
+              top: position.y * 0.5,
+            }}
+          >
+            <BusesTooltip hoveredBus={hoverPointID} />
+          </div>
         </DeckGL>
       </div>
-      <MySideDrawer
-        open={open}
-        setOpen={setOpen}
-        side={"right"}
-        data={selectedBusData}
-      />
     </>
   );
 }
