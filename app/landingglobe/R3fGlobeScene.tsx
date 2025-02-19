@@ -198,12 +198,22 @@ const GlobeViz = () => {
 
   useEffect(() => {
     if (globeReady && globeRef.current && selectedCountry) {
-      const coords = COUNTRY_COORDINATES[selectedCountry];
-      if (coords) {
-        const t = globeRef.current.getCoords(coords[0], coords[1], 1);
-        const vec2 = new Vector3(t.x, t.y, t.z);
-        setPosition(new Vector3(t.x, t.y, t.z));
-        cameraRef.current?.setLookAt(vec2.x, vec2.y, vec2.z, 0, 0, 0, true);
+      try {
+        const coords = COUNTRY_COORDINATES[selectedCountry];
+        if (coords) {
+          setTimeout(() => {
+            if (globeRef.current) {
+              const t = globeRef.current.getCoords(coords[0], coords[1], 1);
+              const vec2 = new Vector3(t.x, t.y, t.z);
+              setPosition(new Vector3(t.x, t.y, t.z));
+              if (cameraRef.current) {
+                cameraRef.current.setLookAt(vec2.x, vec2.y, vec2.z, 0, 0, 0, true);
+              }
+            }
+          }, 100);
+        }
+      } catch (error) {
+        console.error('Error accessing Globe methods:', error);
       }
     }
   }, [selectedCountry, globeReady]);
@@ -238,7 +248,10 @@ const GlobeViz = () => {
           polygonsTransitionDuration={300}
           onClick={handleClick}
           onHover={handleHover}
-          onGlobeReady={() => setGlobeReady(true)}
+          onGlobeReady={() => {
+            console.log('Globe ready');
+            setGlobeReady(true);
+          }}
         />
         <Stars
           radius={100}

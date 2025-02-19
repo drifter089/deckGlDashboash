@@ -143,7 +143,7 @@ const CapacityComparisionDrawer = ({
             />
           </div>
           <DrawerFooter className="w-full border-t">
-            <DrawerClose>
+            <DrawerClose asChild>
               <Button className="w-[80%]">Close Analysis</Button>
             </DrawerClose>
           </DrawerFooter>

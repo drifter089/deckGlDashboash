@@ -297,6 +297,7 @@ export function GenerationMixBarChartStacked({ data }: Props) {
                 tickLine={false}
                 tickMargin={10}
                 axisLine={false}
+                scale="band"
               />
               <YAxis
                 tickLine={false}
@@ -305,6 +306,7 @@ export function GenerationMixBarChartStacked({ data }: Props) {
                 type="number"
                 unit={" TWh"}
                 domain={[0, "dataMax"]}
+                scale="linear"
               />
 
               <ChartLegend

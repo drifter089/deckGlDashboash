@@ -1,11 +1,17 @@
 import React from "react";
-import { COUNTRY_BUS_CONFIGS } from "../MainMap";
-import { COUNTRY_S_NOM_RANGES } from "@/utilities/CountryConfig/Link";
+import { COUNTRY_BUS_CONFIGS } from "../MapboxNetwork";
+import { COUNTRY_S_NOM_RANGES, COUNTRY_BUS_RANGES } from "@/utilities/CountryConfig/Link";
 
 interface MapLegendProps {
-  country: string;
+  country: keyof typeof COUNTRY_BUS_RANGES;
   theme: string;
   type?: "lines" | "buses";
+}
+
+interface BusCategory {
+  label: string;
+  size: number;
+  color: number[];
 }
 
 const LINE_COLOR = [227, 26, 28];
@@ -44,6 +50,17 @@ const roundToNiceNumber = (value: number): number => {
   return (Math.round(normalized * 5) * magnitude) / 5;
 };
 
+const getBusCategories = (country: keyof typeof COUNTRY_BUS_RANGES): BusCategory[] => {
+  const ranges = COUNTRY_BUS_RANGES[country]?.ranges || [];
+  return ranges.map((range, index) => ({
+    label: index === ranges.length - 1 
+      ? `> ${range.min / 1000} GW`
+      : `${range.min / 1000}-${range.max / 1000} GW`,
+    size: range.radius * 2,
+    color: BUS_COLOR
+  })).reverse();
+};
+
 export default function MapLegend({
   country,
   theme,
@@ -52,29 +69,23 @@ export default function MapLegend({
   const validCountries = COUNTRY_S_NOM_RANGES
     ? Object.keys(COUNTRY_S_NOM_RANGES)
     : [];
-  const isValidCountry = country && validCountries.includes(country);
+  const isValidCountry = country && validCountries.includes(country.toUpperCase());
 
   const countryRanges = isValidCountry
-    ? COUNTRY_S_NOM_RANGES[country as keyof typeof COUNTRY_S_NOM_RANGES]
+    ? COUNTRY_S_NOM_RANGES[country.toUpperCase() as keyof typeof COUNTRY_S_NOM_RANGES]
     : DEFAULT_RANGES;
 
-  const busConfig = isValidCountry
-    ? COUNTRY_BUS_CONFIGS[country as keyof typeof COUNTRY_BUS_CONFIGS]
+  const busConfig = isValidCountry && COUNTRY_BUS_CONFIGS[country.toUpperCase() as keyof typeof COUNTRY_BUS_CONFIGS]
+    ? COUNTRY_BUS_CONFIGS[country.toUpperCase() as keyof typeof COUNTRY_BUS_CONFIGS]
     : DEFAULT_BUS_CONFIG;
 
   const calculateLegendBusSizes = (busConfig: typeof DEFAULT_BUS_CONFIG) => {
-    const scaleFactor = (16 / busConfig.maxRadius) * 1000;
-
     return {
-      LARGE: Math.max(6, Math.min(20, busConfig.maxRadius * scaleFactor)),
-      MEDIUM: Math.max(
-        4,
-        Math.min(
-          16,
-          ((busConfig.maxRadius + busConfig.minRadius) / 2) * scaleFactor
-        )
-      ),
-      SMALL: Math.max(3, Math.min(12, busConfig.minRadius * scaleFactor)),
+      VERY_LARGE: 12,
+      LARGE: 10,
+      MEDIUM: 8,
+      SMALL: 6,
+      VERY_SMALL: 4
     };
   };
 
@@ -111,38 +122,16 @@ export default function MapLegend({
     },
   ];
 
-  const busCategories = [
-    {
-      label: `> ${formatPowerValue(
-        roundToNiceNumber(countryRanges.max * 0.7)
-      )}`,
-      size: legendBusSizes.LARGE,
-      color: BUS_COLOR,
-    },
-    {
-      label: `${formatPowerValue(
-        roundToNiceNumber(countryRanges.max * 0.3)
-      )}-${formatPowerValue(roundToNiceNumber(countryRanges.max * 0.7))}`,
-      size: legendBusSizes.MEDIUM,
-      color: BUS_COLOR,
-    },
-    {
-      label: `< ${formatPowerValue(
-        roundToNiceNumber(countryRanges.max * 0.3)
-      )}`,
-      size: legendBusSizes.SMALL,
-      color: BUS_COLOR,
-    },
-  ];
+  const busCategories = getBusCategories(country);
 
   // Renderizar solo las líneas de transmisión
   const renderTransmissionLines = () => {
     return (
       <div className="w-full">
         {lineCategories.map((cat, idx) => (
-          <div key={idx} className="flex items-center mb-1 py-0.5">
+          <div key={idx} className="flex items-center mb-1 py-0">
             <div
-              className="w-8 h-0 mr-2"
+              className="w-8 h-0 mr-3"
               style={{
                 borderTop: `${Math.max(
                   1,
@@ -150,7 +139,7 @@ export default function MapLegend({
                 )}px solid rgba(${LINE_COLOR.join(",")}, 0.8)`,
               }}
             />
-            <span className="text-xs">{cat.label}</span>
+            <span className="text-sm">{cat.label}</span>
           </div>
         ))}
       </div>
@@ -162,16 +151,16 @@ export default function MapLegend({
     return (
       <div className="w-full">
         {busCategories.map((bus, idx) => (
-          <div key={idx} className="flex items-center mb-1 py-0.5">
+          <div key={idx} className="flex items-center mb-1 py-0">
             <div
-              className="mr-2 rounded-full flex-shrink-0"
+              className="mr-3 rounded-full flex-shrink-0"
               style={{
-                width: Math.max(4, bus.size * 0.75),
-                height: Math.max(4, bus.size * 0.75),
+                width: bus.size,
+                height: bus.size,
                 backgroundColor: `rgba(${bus.color.join(",")}, 1)`,
               }}
             />
-            <span className="text-xs">{bus.label}</span>
+            <span className="text-sm">{bus.label}</span>
           </div>
         ))}
       </div>

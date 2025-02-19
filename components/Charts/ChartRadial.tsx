@@ -130,12 +130,12 @@ export function ChartRadial({ data, valueKey, title }: ChartRadialProps) {
     );
 
     return Object.entries(groupedData)
-      .map(([carrier, value]) => {
+      .map(([carrier, value], index) => {
         const carrierKey = carrier.toLowerCase() as CarrierType;
         const percentage = (value / totalValue) * 100;
 
         return {
-          carrier,
+          carrier: carrier || `unknown-${index}`,
           value: value.toFixed(2),
           actualValue: value,
           percentage: percentage.toFixed(1),

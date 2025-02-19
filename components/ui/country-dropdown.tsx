@@ -119,7 +119,9 @@ const CountryDropdownComponent = (
               )}
             </div>
           ) : (
-            <span>{slim ? <Globe size={20} /> : placeholder}</span>
+            <div className="flex items-center gap-2">
+              {slim ? <Globe size={20} /> : <span>{placeholder}</span>}
+            </div>
           )}
         </SelectValue>
       </SelectTrigger>
@@ -130,7 +132,7 @@ const CountryDropdownComponent = (
             <SelectItem
               key={option.alpha3}
               value={option.alpha3}
-              className="w-full"
+              className="flex items-center gap-2 w-full cursor-pointer"
             >
               <div className="inline-block w-5 h-5">
                 <CircleFlag
@@ -138,7 +140,7 @@ const CountryDropdownComponent = (
                   height={20}
                 />
               </div>
-              <span className="inline-block my-auto translate-x-2 -translate-y-1">
+              <span className="inline-block">
                 {option.name}
               </span>
             </SelectItem>

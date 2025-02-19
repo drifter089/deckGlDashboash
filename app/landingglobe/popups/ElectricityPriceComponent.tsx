@@ -43,7 +43,7 @@ const ElectricityPriceComponent = ({
   }, [mouse]);
 
   const fetchData = useCallback(async () => {
-    if (!hoveredCountry && hoveredCountry !== "null") {
+    if (!hoveredCountry || hoveredCountry === "null") {
       setData({
         electricityPrice2050: 0,
         investmentPerCO2: 0,
@@ -98,8 +98,7 @@ const ElectricityPriceComponent = ({
   }, [hoveredCountry]);
 
   useEffect(() => {
-    if (hoveredCountry === "null") {
-      console.log('hoveredCountry === "null"');
+    if (!hoveredCountry || hoveredCountry === "null") {
       gsap.to(contentRef.current, {
         width: 0,
         height: 0,
@@ -107,8 +106,7 @@ const ElectricityPriceComponent = ({
         duration: 0.4,
         delay: 0.08,
       });
-    } else {
-      console.log(hoveredCountry);
+    } else if (contentRef.current) {
       gsap.to(contentRef.current, {
         width: "35vw",
         height: "15vh",
@@ -128,7 +126,7 @@ const ElectricityPriceComponent = ({
       className={`fixed top-0 left-0  h-0 w-0 z-40  mx-auto text-accent-foreground bg-background text-center opacity-1 overflow-hidden`}
       ref={contentRef}
     >
-      {!loading && (
+      {!loading && hoveredCountry && hoveredCountry !== "null" && (
         <div className="w-full h-full grid grid-cols-12">
           <div className="col-span-2 flex flex-col justify-center my-5 pl-3">
             <CircleFlag

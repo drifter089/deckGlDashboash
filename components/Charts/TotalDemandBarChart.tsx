@@ -101,11 +101,13 @@ export function TotalDemandBarChart({ data }: Props) {
               tickLine={false}
               tickMargin={10}
               axisLine={false}
+              scale="band"
             />
             <YAxis
               tickLine={false}
               tickMargin={5}
               axisLine={false}
+              scale="linear"
               label={{
                 value: "Demand (TWh)",
                 angle: -90,

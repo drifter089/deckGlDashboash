@@ -251,6 +251,7 @@ export function InstalledCapacityBarChartStacked({ data }: Props) {
                 tickLine={true}
                 tickMargin={10}
                 axisLine={false}
+                scale="band"
               />
               <YAxis
                 tickLine={false}
@@ -259,6 +260,7 @@ export function InstalledCapacityBarChartStacked({ data }: Props) {
                 type="number"
                 domain={[0, "dataMax"]}
                 unit={" GW"}
+                scale="linear"
               />
 
               <ChartLegend

@@ -1,6 +1,5 @@
 const API_BASE_URL = "/api/geography";
 
-
 export const toLowerCase = (str) => str.toLowerCase();
 
 export const COUNTRY_COLORS = {
@@ -104,4 +103,107 @@ export const COUNTRY_NAMES = {
   NG: "Nigeria",
   US: "United States",
   ZA: "South Africa",
+};
+
+export const COUNTRY_BUS_RANGES = {
+  US: {  // max: 180499 MW, min: 136 MW
+    ranges: [
+      { min: 0, max: 20000, radius: 4 },        // 0-20 GW
+      { min: 20000, max: 50000, radius: 8 },    // 20-50 GW
+      { min: 50000, max: 100000, radius: 12 },  // 50-100 GW
+      { min: 100000, max: 150000, radius: 16 }, // 100-150 GW
+      { min: 150000, max: Infinity, radius: 20 } // >150 GW
+    ],
+    zoomFactor: 1.2
+  },
+  IN: {  // max: 114113 MW, min: 183 MW
+    ranges: [
+      { min: 0, max: 15000, radius: 4 },       // 0-15 GW
+      { min: 15000, max: 35000, radius: 8 },   // 15-35 GW
+      { min: 35000, max: 60000, radius: 12 },  // 35-60 GW
+      { min: 60000, max: 90000, radius: 16 },  // 60-90 GW
+      { min: 90000, max: Infinity, radius: 20 } // >90 GW
+    ],
+    zoomFactor: 1.2
+  },
+  BR: {  // max: 55377 MW, min: 28 MW
+    ranges: [
+      { min: 0, max: 5000, radius: 4 },       // 0-5 GW
+      { min: 5000, max: 15000, radius: 8 },   // 5-15 GW
+      { min: 15000, max: 30000, radius: 12 }, // 15-30 GW
+      { min: 30000, max: 45000, radius: 16 }, // 30-45 GW
+      { min: 45000, max: Infinity, radius: 20 } // >45 GW
+    ],
+    zoomFactor: 1.2
+  },
+  DE: {  // max: 83846 MW, min: 2572 MW
+    ranges: [
+      { min: 0, max: 10000, radius: 4 },       // 0-10 GW
+      { min: 10000, max: 25000, radius: 8 },   // 10-25 GW
+      { min: 25000, max: 45000, radius: 12 },  // 25-45 GW
+      { min: 45000, max: 65000, radius: 16 },  // 45-65 GW
+      { min: 65000, max: Infinity, radius: 20 } // >65 GW
+    ],
+    zoomFactor: 1.2
+  },
+  MX: {  // max: 26155 MW, min: 139 MW
+    ranges: [
+      { min: 0, max: 3000, radius: 4 },      // 0-3 GW
+      { min: 3000, max: 8000, radius: 8 },   // 3-8 GW
+      { min: 8000, max: 15000, radius: 12 }, // 8-15 GW
+      { min: 15000, max: 20000, radius: 16 }, // 15-20 GW
+      { min: 20000, max: Infinity, radius: 20 } // >20 GW
+    ],
+    zoomFactor: 1.2
+  },
+  AU: {  // max: 21507 MW, min: 5.88 MW
+    ranges: [
+      { min: 0, max: 2500, radius: 4 },      // 0-2.5 GW
+      { min: 2500, max: 7500, radius: 8 },   // 2.5-7.5 GW
+      { min: 7500, max: 12500, radius: 12 }, // 7.5-12.5 GW
+      { min: 12500, max: 17500, radius: 16 }, // 12.5-17.5 GW
+      { min: 17500, max: Infinity, radius: 20 } // >17.5 GW
+    ],
+    zoomFactor: 1.2
+  },
+  IT: {  // max: 53326 MW, min: 78 MW
+    ranges: [
+      { min: 0, max: 5000, radius: 4 },       // 0-5 GW
+      { min: 5000, max: 15000, radius: 8 },   // 5-15 GW
+      { min: 15000, max: 25000, radius: 12 }, // 15-25 GW
+      { min: 25000, max: 40000, radius: 16 }, // 25-40 GW
+      { min: 40000, max: Infinity, radius: 20 } // >40 GW
+    ],
+    zoomFactor: 1.2
+  },
+  ZA: {  // max: 40780 MW, min: 108 MW
+    ranges: [
+      { min: 0, max: 2500, radius: 4 },       // 0-2.5 GW
+      { min: 2500, max: 10000, radius: 8 },   // 2.5-10 GW
+      { min: 10000, max: 20000, radius: 12 }, // 10-20 GW
+      { min: 20000, max: 35000, radius: 16 }, // 20-35 GW
+      { min: 35000, max: Infinity, radius: 20 } // >35 GW
+    ],
+    zoomFactor: 1.2
+  },
+  CO: {  // max: 6670 MW, min: 2.16 MW
+    ranges: [
+      { min: 0, max: 500, radius: 4 },      // 0-0.5 GW
+      { min: 500, max: 1500, radius: 8 },   // 0.5-1.5 GW
+      { min: 1500, max: 3000, radius: 12 }, // 1.5-3 GW
+      { min: 3000, max: 5000, radius: 16 }, // 3-5 GW
+      { min: 5000, max: Infinity, radius: 20 } // >5 GW
+    ],
+    zoomFactor: 1.2
+  },
+  NG: {  // max: 10411 MW, min: 0.87 MW
+    ranges: [
+      { min: 0, max: 500, radius: 4 },      // 0-0.5 GW
+      { min: 500, max: 2000, radius: 8 },   // 0.5-2 GW
+      { min: 2000, max: 5000, radius: 12 }, // 2-5 GW
+      { min: 5000, max: 8000, radius: 16 }, // 5-8 GW
+      { min: 8000, max: Infinity, radius: 20 } // >8 GW
+    ],
+    zoomFactor: 1.2
+  }
 };
