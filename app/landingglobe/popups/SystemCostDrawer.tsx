@@ -94,12 +94,15 @@ const SystemCostDrawer = ({
       <DrawerContent className="top-0">
         <ScrollArea className="w-full overflow-y-auto flex flex-wrap justify-center mt-3">
           <DrawerHeader className="w-full pb-2">
-            <DrawerTitle className="text-4xl">Investment Costs Analysis</DrawerTitle>
+            <DrawerTitle className="text-4xl">
+              Investment Costs Analysis
+            </DrawerTitle>
             <DrawerDescription className="text-base">
-              Comparing total system costs and required investments for net-zero transition in {selectedCountry}
+              Comparing total system costs and required investments for net-zero
+              transition in {selectedCountry}
             </DrawerDescription>
           </DrawerHeader>
-          <div className="flex flex-wrap gap-8 justify-center align-middle w-[100%] lg:w-[50%] p-8 border-t-2 mt-4 border-r-2 mx-auto">
+          <div className="flex flex-col flex-wrap gap-8 justify-center align-middle items-center w-[100%] lg:w-[50%] p-8 border-t-2 mt-4 border-r-2 mx-auto">
             <h2 className="w-full text-4xl font-semibold text-card-foreground text-center">
               Current System Costs (2021)
             </h2>
@@ -118,7 +121,8 @@ const SystemCostDrawer = ({
               Net-Zero Target (2050)
             </h2>
             <p className="text-muted-foreground text-center w-full">
-              Projected costs and investments needed to achieve carbon neutrality
+              Projected costs and investments needed to achieve carbon
+              neutrality
             </p>
             <CarrierCostGeneral
               heading="Total System Costs"

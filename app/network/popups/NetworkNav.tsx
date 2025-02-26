@@ -15,8 +15,8 @@ import {
   SheetClose,
 } from "@/components/ui/sheet";
 import { useCountry } from "@/components/country-context";
-import BottomDrawer from "@/components/BottomDrawer";
-import MapLegend from "@/app/network/components/MapLegend";
+import BottomDrawer from "@/app/network/popups/BottomDrawer";
+import MapLegend from "@/app/network/popups/MapLegend";
 import { CountryDropdown } from "@/components/ui/country-dropdown";
 import { Button } from "@/components/ui/button";
 

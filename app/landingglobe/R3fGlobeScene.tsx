@@ -168,9 +168,7 @@ const GlobeViz = () => {
       }
 
       const countryCode = polygonData.properties.country_code.toUpperCase();
-      if (countryCode === "IN") {
-        setHoveredCountry("in");
-      } else if (countryCode === "OUT") {
+      if (countryCode === "OUT") {
         setHoveredCountry("out");
       } else {
         setHoveredCountry(countryCode as "in" | "out" | "null");
