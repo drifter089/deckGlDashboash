@@ -1,12 +1,49 @@
 {
-  "extends": ["next/core-web-vitals", "next/typescript"],
+  "env": {
+    "node": true,
+    "es2021": true,
+    "browser": true
+  },
+  "globals": {
+    "React": true
+  },
+  "extends": [
+    "airbnb",
+    "prettier",
+    "next/typescript",
+    "eslint:recommended",
+    "next/core-web-vitals"
+  ],
+  "parserOptions": {
+    "ecmaVersion": 12,
+    "sourceType": "module",
+    "ecmaFeatures": { "jsx": true }
+  },
+  "plugins": ["prettier"],
   "rules": {
-    "react/no-unescaped-entities": "off",
-    "@next/next/no-page-custom-font": "off",
-    "@typescript-eslint/no-unused-vars": "off",
-    "@typescript-eslint/no-explicit-any": "off",
-    "react-hooks/exhaustive-deps":"off",
-    "@typescript-eslint/no-empty-object-type":"off"
-
+    "no-shadow": "off",
+    "no-console":"warn",
+    "arrow-body-style": "off",
+    "import/extensions": "off",
+    "curly": ["error", "multi"],
+    "react/button-has-type": "off",
+    "react/react-in-jsx-scope": "off",
+    "react/jsx-filename-extension": "off",
+    "semi": 0, // let it handle by prettier
+    "react/function-component-definition": "off",
+    "indent": "off", // let it handle by prettier
+    "max-len": "off", // let it handle by prettier
+    "comma-dangle": "off", // let it handle by prettier
+    "no-redeclare": "off", // let it handle by TypeScript
+    "react/jsx-indent": "off", // let it handle by prettier
+    "no-unused-vars": "off", // let it handle by TypeScript
+    "prettier/prettier": ["error", { "endOfLine": "auto" }],
+    "operator-linebreak": "off", // let it handle by prettier
+    "object-curly-newline": "off", // let it handle by prettier
+    "function-paren-newline": "off", // let it handle by prettier
+    "implicit-arrow-linebreak": "off", // let it handle by prettier
+    "react/require-default-props": "off", // let it handle by TypeScript
+    "nonblock-statement-body-position": "off", // let it handle by prettier
+    "react/jsx-one-expression-per-line": "off" // let it handle by prettier
   }
 }
