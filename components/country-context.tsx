@@ -3,7 +3,7 @@ import React, { createContext, useState, useContext } from "react";
 
 import { COUNTRY_COORDINATES } from "@/utilities/CountryConfig/Link";
 
-type CountryKey = keyof typeof COUNTRY_COORDINATES;
+export type CountryKey = keyof typeof COUNTRY_COORDINATES;
 
 type CountryContextType = {
   selectedCountry: CountryKey;

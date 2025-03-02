@@ -19,8 +19,30 @@ import BottomDrawer from "@/app/network/popups/BottomDrawer";
 import MapLegend from "@/app/network/popups/MapLegend";
 import { CountryDropdown } from "@/components/ui/country-dropdown";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectValue,
+  SelectTrigger,
+  SelectContent,
+  SelectGroup,
+  SelectLabel,
+  SelectItem,
+} from "@/components/ui/select";
+import { regionalGeneratorTypes } from "@/utilities/GenerationMixChartConfig";
 
-const NetworkNav = () => {
+interface NetworkNavProps {
+  networkView: boolean;
+  setNetworkView: React.Dispatch<React.SetStateAction<boolean>>;
+  RegionalDataParams: any;
+  setRegionalDataParams: any;
+}
+
+const NetworkNav = ({
+  networkView,
+  setNetworkView,
+  RegionalDataParams,
+  setRegionalDataParams,
+}: NetworkNavProps) => {
   const { theme, setTheme } = useTheme();
   const pathname = usePathname();
   const { selectedCountry } = useCountry();
@@ -67,6 +89,63 @@ const NetworkNav = () => {
               setIsParentOpen={setOpen}
             />
 
+            <div className="flex items-center justify-between space-x-2 flex-wrap">
+              <p>toggle network view</p>
+              <Switch
+                id="theme"
+                checked={networkView}
+                onClick={(e) => {
+                  setNetworkView(!networkView);
+                }}
+              />
+            </div>
+            <div className="flex gap-2">
+              <Select
+                value={RegionalDataParams.generatorType}
+                onValueChange={(e) =>
+                  setRegionalDataParams({
+                    ...RegionalDataParams,
+                    generatorType: e,
+                  })
+                }
+                disabled={networkView}
+              >
+                <SelectTrigger className="w-[50%]">
+                  <SelectValue placeholder="Generator Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>Generator Types</SelectLabel>
+                    {Object.keys(regionalGeneratorTypes).map((type) => (
+                      <SelectItem key={type} value={type}>
+                        {type}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+              <Select
+                value={RegionalDataParams.param}
+                onValueChange={(e) =>
+                  setRegionalDataParams({
+                    ...RegionalDataParams,
+                    param: e,
+                  })
+                }
+                disabled={networkView}
+              >
+                <SelectTrigger className="w-[50%]">
+                  <SelectValue placeholder="Select a fruit" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>Data</SelectLabel>
+                    <SelectItem value="cf">capacity factor</SelectItem>
+                    <SelectItem value="crt">curtailment</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
             <div className="mt-auto">
               <div className="text-lg font-semibold mb-2">Network Legend</div>
               <div className="grid grid-cols-2 gap-2 bg-primary rounded-lg p-2">
