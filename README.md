@@ -1,36 +1,62 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PyPSA-Earth Visualization Dashboard
+
+This repository houses a dashboard designed to visualize the model output of PyPSA-Earth. The dashboard provides insights into energy models and helps understand current energy networks and future scenarios.
+
+## Data Sources
+
+The visualizations in this dashboard are powered by data processed using scripts from the [jis-validation-repo](https://github.com/open-energy-transition/ji-gis-validation). You can reproduce the database using these scripts. A sample .env file is provided in the repository to help you get started.
 
 ## Getting Started
 
-First, run the development server:
+To run the development server locally:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Main Sections
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Home Page
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The landing page of the dashboard providing an overview of the project and navigation to different sections.
+
+### Now Page
+
+This section visualizes the current state of the energy network and highlights key insights that can be drawn from the existing infrastructure.
+
+![Now Page Preview](./public/images/credits/readme/now.png)
+
+### 2050 Page
+
+Here we showcase the model's capability to estimate future energy scenarios based on given parameters. The visualizations help in understanding potential future states and transitions in energy systems.
+
+![2050 Page Preview](./public/images/credits/readme/2050.png)
+
+### Learn More Page
+
+Coming soon! This section will provide more in-depth information about the models and methodologies.
+
+## Contributors
+
+
+<a href="https://github.com/BryanFran"><img src="https://github.com/BryanFran.png" width="50px" alt="username" /></a>
+<a href="https://github.com/drifter089"><img src="https://github.com/drifter089.png" width="50px" alt="username" /></a>
+<a href="https://github.com/GbotemiB"><img src="https://github.com/GbotemiB.png" width="50px" alt="username" /></a>
+<a href="https://github.com/ekatef"><img src="https://github.com/ekatef.png" width="50px" alt="username" /></a>
+<a href="https://github.com/yerbol-akhmetov"><img src="https://github.com/yerbol-akhmetov.png" width="50px" alt="username" /></a>
+<a href="https://github.com/ElectricMountains"><img src="https://github.com/ElectricMountains.png" width="50px" alt="username" /></a>
+
+
+## Building and Deployment
+
+To build the application for production:
+
+```bash
+npm run build
+```
 
 ## Learn More
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+For more information about PyPSA-Earth:
+- [PyPSA-Earth GitHub](https://github.com/pypsa-meets-earth/pypsa-earth)
+- [PyPSA Github](https://github.com/PyPSA/PyPSA)
