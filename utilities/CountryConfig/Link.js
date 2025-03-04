@@ -1,6 +1,5 @@
 const API_BASE_URL = "/api/geography";
 
-
 export const toLowerCase = (str) => str.toLowerCase();
 
 export const COUNTRY_COLORS = {
@@ -23,7 +22,7 @@ export const getGeoJsonData = (countryCode) => {
     countryView: `${API_BASE_URL}/countryView/${code}`,
     regions: `${API_BASE_URL}/regions/${code}`,
     regions_2021: `${API_BASE_URL}/regions/${code}?year=2021`,
-    regions_2050: `${API_BASE_URL}/regions/${code}?year=2050`
+    regions_2050: `${API_BASE_URL}/regions/${code}?year=2050`,
   };
 };
 
@@ -65,7 +64,7 @@ export const COUNTRY_BUS_CONFIGS = {
   ZA: { minRadius: 5000, maxRadius: 20000, zoomBase: 1.2 },
   IT: { minRadius: 3000, maxRadius: 5000, zoomBase: 1.2 },
   NG: { minRadius: 3000, maxRadius: 5000, zoomBase: 1.2 },
-} ;
+};
 
 export const COUNTRY_COORDINATES = {
   // lat long
@@ -95,16 +94,46 @@ export const COUNTRY_VIEW_CONFIG = {
 };
 
 export const COUNTRY_BOUNDS = {
-  AU: [[113.338953078, -43.6345972634], [153.569469029, -10.6681857235]],
-  BR: [[-73.9872354804, -33.7683777809], [-34.7299934555, 5.24448639569]],
-  CO: [[-78.9909352282, -4.29818694419], [-66.8763258531, 12.4373031682]],
-  DE: [[5.98865807458, 47.3024876979], [15.0169958839, 54.983104153]],
-  IN: [[68.1766451354, 7.96553477623], [97.4025614766, 35.4940095078]],
-  IT: [[6.7499552751, 36.619987291], [18.4802470232, 47.1153931748]],
-  MX: [[-118.3649820989, 14.5321824761], [-86.7235489749, 32.7187629611]],
-  NG: [[2.6917863124, 4.2790553552], [14.6800013683, 13.8659239771]],
-  US: [[-178.334698, 18.910361], [-66.94524, 71.352561]],
-  ZA: [[16.3449768409, -34.8191663551], [32.830120477, -22.1265453832]],
+  AU: [
+    [113.338953078, -43.6345972634],
+    [153.569469029, -10.6681857235],
+  ],
+  BR: [
+    [-73.9872354804, -33.7683777809],
+    [-34.7299934555, 5.24448639569],
+  ],
+  CO: [
+    [-78.9909352282, -4.29818694419],
+    [-66.8763258531, 12.4373031682],
+  ],
+  DE: [
+    [5.98865807458, 47.3024876979],
+    [15.0169958839, 54.983104153],
+  ],
+  IN: [
+    [68.1766451354, 7.96553477623],
+    [97.4025614766, 35.4940095078],
+  ],
+  IT: [
+    [6.7499552751, 36.619987291],
+    [18.4802470232, 47.1153931748],
+  ],
+  MX: [
+    [-118.3649820989, 14.5321824761],
+    [-86.7235489749, 32.7187629611],
+  ],
+  NG: [
+    [2.6917863124, 4.2790553552],
+    [14.6800013683, 13.8659239771],
+  ],
+  US: [
+    [-178.334698, 18.910361],
+    [-66.94524, 71.352561],
+  ],
+  ZA: [
+    [16.3449768409, -34.8191663551],
+    [32.830120477, -22.1265453832],
+  ],
 };
 
 export const COUNTRY_NAMES = {
@@ -119,3 +148,21 @@ export const COUNTRY_NAMES = {
   US: "United States",
   ZA: "South Africa",
 };
+
+export function normalizeSnom(value, country, zoomLevel) {
+  const zoomFactor = Math.pow(1.5, 7 - zoomLevel);
+  const minLineWidth = 10 * zoomFactor;
+  const maxLineWidth = 500 * zoomFactor;
+
+  if (value < 1000) {
+    return minLineWidth + (maxLineWidth - minLineWidth) * 0.2;
+  } else if (value < 5000) {
+    return minLineWidth + (maxLineWidth - minLineWidth) * 0.4;
+  } else if (value < 15000) {
+    return minLineWidth + (maxLineWidth - minLineWidth) * 0.6;
+  } else if (value < 30000) {
+    return minLineWidth + (maxLineWidth - minLineWidth) * 0.8;
+  } else {
+    return maxLineWidth;
+  }
+}
