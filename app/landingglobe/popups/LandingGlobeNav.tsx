@@ -133,12 +133,13 @@ const MainPageNav = ({ open, setIsOpen }: Props) => {
               <X className="h-4 w-4" />
               <span className="sr-only">Close</span>
             </SheetClose>
-            <SheetTitle className="text-4xl">Country Analysis</SheetTitle>
-            <SheetDescription>
-              Explore statistics for your selected country
-            </SheetDescription>
+            <SheetTitle className="text-4xl">2050</SheetTitle>
           </SheetHeader>
           <CountryDropdown defaultValue={selectedCountry} />
+          <p>
+            See detailed comparison between the latest data and a future net
+            zero scenario.
+          </p>
           <SystemCostDrawer
             selectedCountry={selectedCountry}
             isParentOpen={open}

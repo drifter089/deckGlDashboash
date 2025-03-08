@@ -18,6 +18,7 @@ import { CarrierCostGeneral } from "@/components/Charts/CarrierCostPie";
 import { TotalSystemCost_info } from "@/utilities/TooltipInfo/ExplainerText/TotalSystemCost";
 import ChartInfoTooltip from "@/utilities/TooltipInfo/HoverComponents/ChartInfoTooltip";
 import { CircleFlag } from "react-circle-flags";
+import { ElectricityPrice_info } from "@/utilities/TooltipInfo/ExplainerText/ElectricityPrice";
 
 type Props = {
   selectedCountry: string;
@@ -50,6 +51,18 @@ const SystemCostDrawer = ({
     { suspense: false }
   );
 
+  const { data: electricityPrice2021 } = useSWR(
+    `/api/electricity_prices/${selectedCountry}/2021`,
+    fetcher,
+    { suspense: false }
+  );
+
+  const { data: electricityPrice2050 } = useSWR(
+    `/api/electricity_prices/${selectedCountry}/2050`,
+    fetcher,
+    { suspense: false }
+  );
+
   const [totalCostsState2021, setTotalCostsState2021] =
     React.useState<typeof totalCostsData2021>(null);
 
@@ -58,6 +71,12 @@ const SystemCostDrawer = ({
 
   const [investmentsNeededState2050, setInvestmentsNeededState2050] =
     React.useState<typeof investmentsNeededData2050>(null);
+
+  const [electricityPriceState2021, setElectricityPriceState2021] =
+    React.useState<typeof electricityPrice2021>(null);
+
+  const [electricityPriceState2050, setElectricityPriceState2050] =
+    React.useState<typeof electricityPrice2050>(null);
 
   const [open, setOpen] = React.useState(false);
 
@@ -78,6 +97,19 @@ const SystemCostDrawer = ({
       setInvestmentsNeededState2050(investmentsNeededData2050.data);
     }
   }, [investmentsNeededData2050]);
+
+  useEffect(() => {
+    if (electricityPrice2021?.data) {
+      setElectricityPriceState2021(electricityPrice2021.data);
+    }
+  }, [electricityPrice2021]);
+
+  useEffect(() => {
+    if (electricityPrice2050?.data) {
+      setElectricityPriceState2050(electricityPrice2050.data);
+    }
+    console.log("electricityPrice2050", electricityPrice2050);
+  }, [electricityPrice2050]);
 
   useEffect(() => {
     if (open) {
@@ -119,6 +151,22 @@ const SystemCostDrawer = ({
             <h2 className="w-full text-3xl font-semibold text-card-foreground text-center">
               Current (2021)
             </h2>
+            {electricityPriceState2021 &&
+            Array.isArray(electricityPriceState2021) &&
+            electricityPriceState2021.length > 0 ? (
+              <p className="w-full text-2xl font-semibold text-card-foreground text-center">
+                Electricity Price{" "}
+                <ChartInfoTooltip
+                  tooltipInfo={ElectricityPrice_info}
+                  className="h-5 w-5"
+                />{" "}
+                - {electricityPriceState2021[0]?.electricity_price ?? "N/A"}
+              </p>
+            ) : (
+              <p className="w-full text-2xl font-semibold text-card-foreground text-center">
+                Loading electricity price...
+              </p>
+            )}
             <CarrierCostGeneral
               heading="Total System Costs"
               data={totalCostsState2021}
@@ -129,6 +177,22 @@ const SystemCostDrawer = ({
             <h2 className="w-full text-3xl font-semibold text-card-foreground text-center">
               Net-Zero Target (2050)
             </h2>
+            {electricityPriceState2050 &&
+            Array.isArray(electricityPriceState2050) &&
+            electricityPriceState2050.length > 0 ? (
+              <p className="w-full text-2xl font-semibold text-card-foreground text-center">
+                Electricity Price{" "}
+                <ChartInfoTooltip
+                  tooltipInfo={ElectricityPrice_info}
+                  className="h-5 w-5"
+                />{" "}
+                - {electricityPriceState2050[0]?.electricity_price ?? "N/A"}
+              </p>
+            ) : (
+              <p className="w-full text-2xl font-semibold text-card-foreground text-center">
+                Loading electricity price...
+              </p>
+            )}
             <CarrierCostGeneral
               heading="Total System Costs"
               data={totalCostsState2050}

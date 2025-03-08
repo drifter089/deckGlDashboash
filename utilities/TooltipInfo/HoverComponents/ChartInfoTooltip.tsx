@@ -35,7 +35,11 @@ const ChartInfoTooltip = ({
         asChild
         className={`relative cursor-pointer inline-block `}
       >
-        <InfoCircledIcon className={`${className || ""}`} />
+        <InfoCircledIcon
+          className={`${className || ""}`}
+          width={24}
+          height={24}
+        />
       </HoverCardTrigger>
       <HoverCardContent className="w-96 p-4 space-y-4">
         <div>

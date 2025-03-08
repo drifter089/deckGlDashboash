@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import dynamic from "next/dynamic";
 import MainPageNav from "./popups/LandingGlobeNav";
+import GlobeLegend from "./popups/GlobeLegend";
 
 const Globe = dynamic(() => import("./R3fGlobeScene"), {
   ssr: false,
@@ -21,7 +22,7 @@ export default function LandingGlobe() {
     <div className="relative w-full h-screen">
       <Globe />
       <MainPageNav open={isOpen} setIsOpen={setIsOpen} />
-      {/* <ElectricityPriceComponent /> */}
+      <GlobeLegend />
     </div>
   );
 }
