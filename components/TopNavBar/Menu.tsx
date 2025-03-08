@@ -73,6 +73,8 @@ const Menu = () => {
           { href: "/", text: "About" },
           { href: "/network", text: "Now" },
           { href: "/landingglobe", text: "2050" },
+          { href: "/scenarios", text: "Scenarios" },
+          { href: "/learnmore", text: "Learn more" },
         ].map(({ href, text }) => (
           <Link
             key={href}

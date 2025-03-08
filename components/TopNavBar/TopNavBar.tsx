@@ -57,7 +57,14 @@ export function NavigationMenuDemo() {
             </NavigationMenuLink>
           </Link>
         </NavigationMenuItem>
-        
+        <NavigationMenuItem className="hidden lg:block">
+          <Link href="/Scenarios">
+            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+              Scenarios
+            </NavigationMenuLink>
+          </Link>
+        </NavigationMenuItem>
+
         <NavigationMenuItem
           onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
         >
