@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { Map } from "react-map-gl/maplibre";
 import DeckGL from "@deck.gl/react";
+import { Layer } from "@deck.gl/core";
 
 import type { MapViewState } from "@deck.gl/core";
 import { FlyToInterpolator } from "deck.gl";
@@ -41,7 +42,6 @@ const MAP_STYLE_DARK =
 interface MainMapProps {
   networkView: boolean;
   regionGeneratorValue: keyof typeof regionalGeneratorTypes;
-
   regionParamValue: string;
 }
 
@@ -52,41 +52,33 @@ export default function MainMap({
 }: MainMapProps) {
   const { theme: currentTheme } = useTheme();
   const DeckRef = useRef(null);
-  const { selectedCountry, setSelectedCountry } = useCountry();
+  const { selectedCountry } = useCountry();
 
   const [hoverPointID, setHoverPointID] = useState<string | null>(null);
-
   const position = useRef({ x: 0, y: 0 });
-
-  const [initialViewState, setInitialViewState] =
-    useState<MapViewState>(INITIAL_VIEW_STATE);
-
+  const [initialViewState, setInitialViewState] = useState<MapViewState>(INITIAL_VIEW_STATE);
   const [zoomLevel, setZoomLevel] = useState(4);
-
-  const [deckLayers, setdeckLayers] = useState<any[]>([]);
+  const [deckLayers, setdeckLayers] = useState<Layer<any>[]>([]);
 
   useEffect(() => {
     const links = getGeoJsonData(selectedCountry);
-
     
+    const layers: Layer<any>[] = [CountryLayer({ links })];
 
-    if (networkView) {
-      setdeckLayers([
-        CountryLayer({ links }),
-        LinesLayer({ zoomLevel, links, selectedCountry }),
-      ]);
-    } else {
-      setdeckLayers([
-        CountryLayer({ links }),
-        // RegionLayer({
-        //   regionGeneratorValue,
-        //   regionParamValue,
-        //   links,
-        //   selectedCountry,
-        // }),
-        LinesLayer({ zoomLevel, links, selectedCountry }),
-      ]);
+    if (!networkView && regionGeneratorValue && regionParamValue) {
+      layers.push(
+        RegionLayer({
+          regionGeneratorValue,
+          regionParamValue,
+          links,
+          selectedCountry,
+        })
+      );
     }
+
+    layers.push(LinesLayer({ zoomLevel, links, selectedCountry }));
+
+    setdeckLayers(layers);
   }, [
     selectedCountry,
     zoomLevel,

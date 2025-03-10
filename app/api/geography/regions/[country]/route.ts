@@ -36,46 +36,50 @@ export async function GET(
     }
 
     return await withDbClient(async (client) => {
-      let viewName = `regions_${country}_${year}_materialized`;
-
+      // Check if the view exists for the given country and year
+      const viewName = `regions_${country}_${year}`;
       const viewCheck = await client.query(
         `
         SELECT EXISTS (
-          SELECT FROM pg_matviews 
-          WHERE schemaname = 'public' 
-          AND matviewname = $1
+          SELECT FROM information_schema.views 
+          WHERE table_schema = 'public' 
+          AND table_name = $1
         );
-      `,
+        `,
         [viewName]
       );
 
       if (!viewCheck.rows[0].exists) {
-        const regularViewName = `regions_${country}_${year}`;
-        const regularViewCheck = await client.query(
-          `
-          SELECT EXISTS (
-            SELECT FROM information_schema.views 
-            WHERE table_schema = 'public' 
-            AND table_name = $1
-          );
-        `,
-          [regularViewName]
+        return createErrorResponse(
+          `View ${viewName} does not exist`,
+          404
         );
+      }
 
-        if (!regularViewCheck.rows[0].exists) {
-          return createErrorResponse(
-            `View ${regularViewName} does not exist`,
-            404
-          );
-        }
+      // Check if generator metrics table exists
+      const metricsTableName = `generator_metrics_${country}`;
+      const metricsCheck = await client.query(
+        `
+        SELECT EXISTS (
+          SELECT FROM information_schema.tables 
+          WHERE table_schema = 'public' 
+          AND table_name = $1
+        );
+        `,
+        [metricsTableName]
+      );
 
-        viewName = regularViewName;
+      if (!metricsCheck.rows[0].exists) {
+        return createErrorResponse(
+          `Generator metrics table ${metricsTableName} does not exist`,
+          404
+        );
       }
 
       const countQuery = `
         SELECT COUNT(*) 
-        FROM ${viewName}
-        WHERE geometry IS NOT NULL;
+        FROM ${viewName} r
+        WHERE r.geometry IS NOT NULL
       `;
       const countResult = await client.query(countQuery);
       const totalCount = parseInt(countResult.rows[0].count);
@@ -84,56 +88,58 @@ export async function GET(
       const query = `
         WITH base_data AS (
           SELECT 
-        id,
-        name,
-        country,
-        country_code,
-        "Generator",
-        cf,
-        crt,
-        usdpt,
-        horizon,
-        scenario_id,
-        -- Simplify geometry based on parameter
-        ST_SimplifyPreserveTopology(
-          geometry,
-          $1
-        ) as geometry
-          FROM ${viewName}
-          WHERE SPLIT_PART("Generator", ' ', -1) = '${generator_type}' 
-          AND geometry IS NOT NULL
-          ORDER BY id
-          LIMIT $2 OFFSET $3
+            r.id,
+            r.name,
+            r.country_code,
+            COALESCE(gm.carrier, $2) as carrier,
+            COALESCE(AVG(gm.cf), 0) as cf,
+            COALESCE(AVG(gm.crt), 0) as crt,
+            COALESCE(AVG(gm.usdpt), 0) as usdpt,
+            '${year}' as horizon,
+            1 as scenario_id,
+            ST_SimplifyPreserveTopology(r.geometry, $1) as geometry,
+            CASE 
+              WHEN gm.carrier IS NULL THEN true
+              ELSE false
+            END as is_empty_data
+          FROM ${viewName} r
+          LEFT JOIN public.${metricsTableName} gm ON r.name = gm.bus
+            AND gm.carrier = $2
+            AND gm.carrier NOT IN ('csp', 'load')
+          WHERE r.geometry IS NOT NULL
+          GROUP BY r.id, r.name, r.country_code, gm.carrier, r.geometry
+          ORDER BY r.id
+          LIMIT $3 OFFSET $4
         )
         SELECT jsonb_build_object(
           'type', 'FeatureCollection',
           'features', COALESCE(
-        jsonb_agg(
-          jsonb_build_object(
-            'type', 'Feature',
-            'id', CONCAT('${country}', '_', id),
-            'geometry', ST_AsGeoJSON(geometry)::jsonb,
-            'properties', jsonb_build_object(
-          'id', id,
-          'name', name,
-          'country', country,
-          'country_code', country_code,
-          'Generator', "Generator",
-          'cf', cf,
-          'crt', crt,
-          'usdpt', usdpt,
-          'horizon', horizon,
-          'scenario_id', scenario_id
-            )
-          )
-        ) FILTER (WHERE id IS NOT NULL),
-        '[]'::jsonb
+            jsonb_agg(
+              jsonb_build_object(
+                'type', 'Feature',
+                'id', CONCAT('${country}', '_', id),
+                'geometry', ST_AsGeoJSON(geometry)::jsonb,
+                'properties', jsonb_build_object(
+                  'id', id,
+                  'name', name,
+                  'country_code', country_code,
+                  'carrier', carrier,
+                  'cf', cf,
+                  'crt', crt,
+                  'usdpt', usdpt,
+                  'horizon', horizon,
+                  'scenario_id', scenario_id,
+                  'is_empty_data', is_empty_data
+                )
+              )
+            ) FILTER (WHERE id IS NOT NULL),
+            '[]'::jsonb
           ),
           'metadata', jsonb_build_object(
-        'page', ${page},
-        'pageSize', ${pageSize},
-        'totalPages', ${totalPages},
-        'totalCount', ${totalCount}
+            'page', ${page},
+            'pageSize', ${pageSize},
+            'totalPages', ${totalPages},
+            'totalCount', ${totalCount}
           )
         ) as geojson
         FROM base_data;
@@ -141,6 +147,7 @@ export async function GET(
 
       const result = await client.query(query, [
         simplification,
+        generator_type,
         pageSize,
         offset,
       ]);

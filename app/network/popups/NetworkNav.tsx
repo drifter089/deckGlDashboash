@@ -95,8 +95,8 @@ const NetworkNav = ({
               setIsParentOpen={setOpen}
             />
 
-{/*             <div className="flex items-center justify-between space-x-2 flex-wrap">
-              <p>Regional view</p>
+            <div className="flex items-center justify-between space-x-2 flex-wrap">
+              <p>Generator Metrics View</p>
               <Switch
                 id="theme"
                 checked={networkView}
@@ -121,17 +121,42 @@ const NetworkNav = ({
                 <SelectContent>
                   <SelectGroup>
                     <SelectLabel>Generator Types</SelectLabel>
-                    {Object.keys(regionalGeneratorTypes).map((type) => (
-                      <SelectItem key={type} value={type}>
-                        {type}
-                      </SelectItem>
+                    {Object.keys(regionalGeneratorTypes)
+                      .filter(type => {
+                        // Exclude csp and load always
+                        if (type === 'csp' || type === 'load') return false;
+                        
+                        // Filter by parameter type
+                        switch(regionParamValue) {
+                          case 'cf':
+                          case 'crt':
+                          case 'usdpt':
+                            // These metrics only make sense for variable renewables
+                            return ['onwind', 'offwind-ac', 'offwind-dc', 'solar', 'ror'].includes(type);
+                          default:
+                            return true;
+                        }
+                      })
+                      .map((type) => (
+                        <SelectItem key={type} value={type}>
+                          {type}
+                        </SelectItem>
                     ))}
                   </SelectGroup>
                 </SelectContent>
               </Select>
               <Select
                 value={regionParamValue}
-                onValueChange={(e) => setRegionParamValue(e)}
+                onValueChange={(e) => {
+                  setRegionParamValue(e);
+                  const validGenerators = e === 'cf' || e === 'crt' || e === 'usdpt' 
+                    ? ['onwind', 'offwind-ac', 'offwind-dc', 'solar', 'ror']
+                    : Object.keys(regionalGeneratorTypes).filter(type => type !== 'csp' && type !== 'load');
+                  
+                  if (!validGenerators.includes(regionGeneratorValue)) {
+                    setRegionGeneratorValue(validGenerators[0] as keyof typeof regionalGeneratorTypes);
+                  }
+                }}
                 disabled={networkView}
               >
                 <SelectTrigger className="w-[50%]">
@@ -140,12 +165,14 @@ const NetworkNav = ({
                 <SelectContent>
                   <SelectGroup>
                     <SelectLabel>Data</SelectLabel>
-                    <SelectItem value="cf">capacity factor</SelectItem>
-                    <SelectItem value="crt">curtailment</SelectItem>
+                    <SelectItem value="cf">Capacity Factor</SelectItem>
+                    <SelectItem value="crt">Curtailment</SelectItem>
+                    <SelectItem value="usdpt">Used Potential</SelectItem>
                   </SelectGroup>
                 </SelectContent>
               </Select>
-            </div> */}
+            </div>
+
             <div className="mt-auto">
               <div className="text-lg font-semibold mb-2">Network Legend</div>
               <div className="grid grid-cols-2 gap-2 bg-primary rounded-lg p-2">
