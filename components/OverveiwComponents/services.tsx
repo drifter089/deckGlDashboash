@@ -6,7 +6,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-
 interface ServiceProps {
   title: string;
   description: string;
