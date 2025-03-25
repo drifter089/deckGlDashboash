@@ -96,7 +96,7 @@ const CapacityComparisionDrawer = ({
         </Button>
       </DrawerTrigger>
       <DrawerContent className="top-0">
-        <ScrollArea className="w-full overflow-y-auto flex flex-wrap justify-center align-middle mt-3">
+        <ScrollArea className="w-full overflow-y-auto flex flex-wrap justify-center mt-3">
           <DrawerHeader className="w-full flex gap-2 align-middle">
             <CircleFlag
               countryCode={selectedCountry.toLowerCase()}
