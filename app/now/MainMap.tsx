@@ -2,7 +2,6 @@
 
 import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import dynamic from 'next/dynamic';
-import { Map } from "react-map-gl/maplibre";
 import DeckGL from "@deck.gl/react";
 
 import type { MapViewState } from "@deck.gl/core";
@@ -23,6 +22,12 @@ import CountryLayer from "./layers/CountryLayer";
 import RegionLayer from "./layers/RegionLayer";
 import NetworkNav from "./popups/NetworkNav";
 import { regionalGeneratorTypes } from "@/utilities/GenerationMixChartConfig";
+
+// Dynamically import the Map component with specific settings
+const Map = dynamic(
+  () => import('react-map-gl/maplibre').then((mod) => mod.Map),
+  { ssr: false, loading: () => <div>Loading map...</div> }
+);
 
 const INITIAL_VIEW_STATE: MapViewState = {
   latitude: 49.254,

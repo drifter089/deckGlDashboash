@@ -2,6 +2,7 @@
 import React, { useEffect } from "react";
 import MainMap from "./MainMap";
 import NetworkNav from "./popups/NetworkNav";
+import BusLegend from "./popups/BusLegend";
 import { regionalGeneratorTypes } from "@/utilities/GenerationMixChartConfig";
 
 const Page = () => {
@@ -27,6 +28,7 @@ const Page = () => {
           regionParamValue={regionParamValue}
           setRegionParamValue={setRegionParamValue}
         />
+        <BusLegend />
       </div>
     </div>
   );
