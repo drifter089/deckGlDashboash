@@ -29,7 +29,7 @@ export const HeroSection = () => {
 
           <div className="space-y-4 md:space-y-0 md:space-x-4">
             <Button
-              className="w-full md:w-1/4 text-card-foreground dark:hover:bg-secondary hover:bg-ring"
+              className="text-[1.25rem] w-full md:w-1/4 text-card-foreground dark:hover:bg-secondary hover:bg-ring shadow-md transition duration-300 ease-in-out transform hover:shadow-lg hover:scale-105"
               variant="outline"
             >
               <Link href="/now">Now</Link>
@@ -37,7 +37,7 @@ export const HeroSection = () => {
 
             <Button
               asChild
-              className="w-full md:w-1/4 dark:bg-secondary bg-ring dark:text-card-foreground text-destructive-foreground hover:bg-popover-foreground dark:hover:bg-border "
+              className="w-full md:w-1/4 dark:bg-secondary bg-ring dark:text-card-foreground text-destructive-foreground hover:bg-popover-foreground dark:hover:bg-border text-[1.25rem]"
             >
               <Link href="/2050">
                 2050
