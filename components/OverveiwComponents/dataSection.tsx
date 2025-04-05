@@ -13,38 +13,52 @@ interface DataProps {
 
 const DataList: DataProps[] = [
   {
-    icon: "Zap",
-    title: "Compare Installed Capacity",
-    description: "Current vs. Future Energy Infrastructure",
-  },
-  {
     icon: "HandCoins",
     title: "Investment Requirements",
     description:
-      "The cost of getting to Net-Zero, with investment needs per resource type",
-  },
-  {
-    icon: "ChartPie",
-    title: "Energy Generation Mix",
-    description:
-      "Discover which resources will supply your electricity in 2050",
-  },
-  {
-    icon: "Network",
-    title: "Network Statistics & Model Comparisons",
-    description:
-      "Validate PyPSA-generated energy data with external datasets (EMBER, EIA)",
-  },
-  {
-    icon: "Leaf",
-    title: "CO₂ Emissions to Zero",
-    description:
-      "Our scenarios constrain CO₂ emissions to zero, ensuring power will come from renewables",
+      "Explore how much investment is needed to reach net-zero, broken down by resource type and country.",
   },
   {
     icon: "CircleDollarSign",
     title: "Total System Costs",
-    description: "The cost to run the grid in 2050",
+    description:
+      "Discover the overall cost of running the future electricity system — including generation, storage, and grid.",
+  },
+  {
+    icon: "ChartPie",
+    title: "Future Energy Mix",
+    description:
+      "See which energy sources are projected to power your country in 2050 under a clean energy scenario.",
+  },
+  {
+    icon: "Zap",
+    title: "Infrastructure Expansion Outlook",
+    description:
+      "Explore how generation, storage, and grid capacity must expand by 2050 — broken down by technology and region.",
+  },
+  {
+    icon: "Network",
+    title: "Model Validation & Benchmarking",
+    description:
+      "Compare PyPSA-Earth data with other datasets like EMBER and EIA to validate assumptions and outputs.",
+  },
+  {
+    icon: "Globe",
+    title: "Regional Comparisons",
+    description:
+      "Compare countries or regions across key metrics like cost, emissions, and renewable share.",
+  },
+  {
+    icon: "Cpu",
+    title: "Technology Performance & Market Fit",
+    description:
+      "Evaluate how different energy technologies perform under future scenarios and where they offer the most value.",
+  },
+  {
+    icon: "Code",
+    title: "Open Source & Reproducible",
+    description:
+      "All data, models, and workflows are fully open-source — empowering users to explore, reproduce, and extend the results freely.",
   },
 ];
 

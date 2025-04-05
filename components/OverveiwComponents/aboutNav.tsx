@@ -29,14 +29,6 @@ export const AboutNav: React.FC<AboutNavProps> = ({
       </div>
       <div
         className="cursor-pointer"
-        onClick={() => setCurrentSection("next-step")}
-      >
-        <AnimatedNavLink selected={currentSection === "next-step"}>
-          Next steps
-        </AnimatedNavLink>
-      </div>
-      <div
-        className="cursor-pointer"
         onClick={() => setCurrentSection("methods")}
       >
         <AnimatedNavLink selected={currentSection === "methods"}>
@@ -49,6 +41,14 @@ export const AboutNav: React.FC<AboutNavProps> = ({
       >
         <AnimatedNavLink selected={currentSection === "limitations"}>
           Limitations
+        </AnimatedNavLink>
+      </div>
+      <div
+        className="cursor-pointer"
+        onClick={() => setCurrentSection("next-step")}
+      >
+        <AnimatedNavLink selected={currentSection === "next-step"}>
+          Next steps
         </AnimatedNavLink>
       </div>
     </div>

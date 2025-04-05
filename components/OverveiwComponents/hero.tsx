@@ -23,7 +23,8 @@ export const HeroSection = () => {
               </h1>
             </div>
             <p className="max-w-screen mx-auto md:text-[1.25rem] text-[1rem] text-muted-foreground font-mono">
-              We modelled the grid in 2050 with our open-source stack
+              A simple prototype. We modelled 100% clean grids for 2050 with our
+              open-source stack.
             </p>
           </div>
 

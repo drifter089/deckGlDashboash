@@ -42,8 +42,8 @@ export default function Page() {
       <DataSection />
       {/* <ServicesSection />
       <BenefitsSection /> */}
+      {/* <FeaturesSection /> */}
       <ReverseInfo />
-      <FeaturesSection />
       <CommunitySection />
       <ScrollButton />
       {/* <CreditsSection /> */}
