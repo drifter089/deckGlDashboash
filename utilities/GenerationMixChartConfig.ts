@@ -122,7 +122,7 @@ export const GenerationMixchartConfigSmall = {
     color: "hsl(var(--chart-solar))",
   },
   onwind: {
-    label: "Wind",
+    label: "Wind Onshore",
     color: "hsl(var(--chart-onwind))",
   },
   offwind: {
@@ -150,15 +150,15 @@ export const GenerationMixchartConfigSmall = {
     color: "hsl(var(--chart-lignite))",
   },
   ror: {
-    label: "Run of River",
+    label: "Hydro",
     color: "hsl(var(--chart-ror))",
   },
   "offwind-ac": {
-    label: "off wind ac",
+    label: "Wind Offshore AC",
     color: "hsl(var(--chart-offwind-ac))",
   },
   "offwind-dc": {
-    label: "off wind dc",
+    label: "Wind Offshore DC",
     color: "hsl(var(--chart-offwind-dc))",
   },
 } satisfies ChartConfig;
