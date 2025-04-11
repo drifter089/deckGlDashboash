@@ -1,0 +1,27 @@
+# See https://github.com/marketplace/actions/netlify-actions
+name: Build and Deploy to Netlify
+on:
+  push:
+  pull_request:
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      # ( Build to ./dist or other directory... )
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - run: npm ci
+
+      - run: npm run build
+
+      - name: Deploy to Netlify
+        uses: nwtgck/actions-netlify@v3.0
+        with:
+          publish-dir: "./.next/"
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        timeout-minutes: 1
